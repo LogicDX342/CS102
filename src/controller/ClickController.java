@@ -1,5 +1,7 @@
 package controller;
 
+import java.io.File;
+import java.util.ArrayList;
 
 import model.ChessComponent;
 import view.Chessboard;
@@ -26,7 +28,7 @@ public class ClickController {
                 first = null;
                 recordFirst.repaint();
             } else if (handleSecond(chessComponent)) {
-                //repaint in swap chess method.
+                // repaint in swap chess method.
                 chessboard.swapChessComponents(first, chessComponent);
                 chessboard.swapColor();
 
@@ -54,4 +56,6 @@ public class ClickController {
         return chessComponent.getChessColor() != chessboard.getCurrentColor() &&
                 first.canMoveTo(chessboard.getChessComponents(), chessComponent.getChessboardPoint());
     }
+
+    
 }
