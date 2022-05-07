@@ -1,11 +1,21 @@
 package view;
 
 import controller.GameController;
+import model.User;
 
+import javax.imageio.ImageIO;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
+import java.awt.event.*;
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 
 /**
  * 这个类表示游戏过程中的整个游戏界面，是一切的载体
@@ -17,72 +27,193 @@ public class ChessGameFrame extends JFrame {
     public final int CHESSBOARD_SIZE;
     private GameController gameController;
     private JLabel statusLabel;
+    private UserList userList = new UserList();
+    private JPanel menu;
+    private JPanel game;
+    private CardLayout card = new CardLayout();
+    private File background;
+    private javax.swing.Timer timer;
+    private JLabel countdownLabel = new JLabel();
 
     public ChessGameFrame(int width, int height) {
         setTitle("2022 CS102A Project"); // 设置标题
         this.WIDTH = width;
         this.HEIGTH = height;
         this.CHESSBOARD_SIZE = HEIGTH * 4 / 5;
+        background = new File("Chess/resource/image/background1.png");
 
         setSize(WIDTH, HEIGTH);
         setLocationRelativeTo(null); // Center the window.
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); // 设置程序关闭按键，如果点击右上方的叉就游戏全部关闭了
-        setLayout(null);
+        setLayout(card);
+        menu = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                try {
+                    g.drawImage(ImageIO.read(background), 0, 0, getWidth(), getHeight(), this);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        menu.setLayout(null);
+        game = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                try {
+                    g.drawImage(ImageIO.read(background), 0, 0, getWidth(), getHeight(), this);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
 
+        game.setLayout(null);
+        add(menu, "Menu");
         addStartGameButtom();
         addRankButtom();
         addSignInButtom();
         addSignUpButtom();
-        
+
+        add(game, "Game");
+        addChessboard();
+        addColorLabel();
+        addLoadButton();
+        addSaveButton();
+        addResetButton();
+        addMenuButton();
+        addBackgroundButtom();
+
+        card.show(this.getContentPane(), "Menu");
+
+        musicPlayer("bgm.wav", true);
     }
 
     private void addStartGameButtom() {
         JButton button = new JButton("Start Game");
-        button.setLocation(WIDTH/2-100, HEIGTH / 10 + 240);
+        button.setLocation(WIDTH / 2 - 100, HEIGTH / 10 + 240);
         button.setSize(200, 60);
         button.setFont(new Font("Rockwell", Font.BOLD, 20));
-        add(button);
-
+        menu.add(button);
         button.addActionListener(e -> {
             System.out.println("Start game");
-            getContentPane().removeAll();
-            addChessboard();
-            addLabel();
-            addLoadButton();
-            addSaveButton();
-            addResetButton();
-            repaint();
+            card.show(this.getContentPane(), "Game");
+            addCountdownLabel(true);
         });
     }
-    private void addRankButtom(){
-        JButton button = new JButton(new ImageIcon(" images"));
-        button.setLocation(WIDTH/2-100, HEIGTH / 10 + 360);
+
+    private void addRankButtom() {
+        JButton button = new JButton("Rank");
+        button.setLocation(WIDTH / 2 - 100, HEIGTH / 10 + 360);
         button.setSize(200, 60);
         button.setFont(new Font("Rockwell", Font.BOLD, 20));
-        add(button);
+        menu.add(button);
 
         button.addActionListener(e -> {
+            System.out.println("Click rank");
+            SwingUtilities.invokeLater(() -> {
+                JFrame rank = userList.showRank();
+                rank.setVisible(true);
+            });
         });
     }
-    private void addSignInButtom(){
+
+    private void addSignInButtom() {
         JButton button = new JButton("Sign in");
         button.setLocation(10, 10);
         button.setSize(50, 50);
         button.setFont(new Font("Rockwell", Font.BOLD, 20));
-        add(button);
+        menu.add(button);
 
         button.addActionListener(e -> {
+            String userName = JOptionPane.showInputDialog(this, "Input your username", "Sign in",
+                    JOptionPane.INFORMATION_MESSAGE);
+            if (userName != null) {
+                String password = JOptionPane.showInputDialog(this, "Input your password", "Sign in",
+                        JOptionPane.INFORMATION_MESSAGE);
+                if (password != null) {
+                    boolean check = false;
+                    for (User user : userList.getUserList()) {
+                        if (user.getUserName().equals(userName)) {
+                            if (user.checkPassword(password)) {
+                                gameController.setUser(user);
+                                check = true;
+                            }
+                        }
+                    }
+                    if (check) {
+                        JOptionPane.showMessageDialog(this, "Successfully sign in");
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Wrong username or password");
+                    }
+                }
+            }
+
         });
     }
-    private void addSignUpButtom(){
+
+    private void addSignUpButtom() {
         JButton button = new JButton("Sign up");
-        button.setLocation(80,  10 );
+        button.setLocation(80, 10);
         button.setSize(50, 50);
         button.setFont(new Font("Rockwell", Font.BOLD, 20));
-        add(button);
+        menu.add(button);
 
         button.addActionListener(e -> {
-            JOptionPane.showInputDialog(this, "UserName");
+            // JFrame jf = new JFrame("Sign UP");
+            // JPanel jp = new JPanel();
+            // jp.setLayout(null);
+            // jp.add(new JLabel("username"));
+            // jp.add(new JTextField(20));
+            // jp.add(new JLabel("password"));
+            // jp.add(new JTextField(20));
+            // jf.setSize(400, 200);
+            // jf.setLocationRelativeTo(null);
+            // jf.setVisible(true);
+
+            String userName = JOptionPane.showInputDialog(this, "Input your username", "Sign up",
+                    JOptionPane.INFORMATION_MESSAGE);
+            if (userName != null) {
+                String password = JOptionPane.showInputDialog(this, "Input your password", "Sign up",
+                        JOptionPane.INFORMATION_MESSAGE);
+                if (password != null) {
+                    String[] opt = { "Default", "Select from file" };
+                    switch (JOptionPane.showOptionDialog(this, "Choose your avatar", "Sign up",
+                            JOptionPane.DEFAULT_OPTION,
+                            JOptionPane.INFORMATION_MESSAGE, null, opt, opt[0])) {
+                        case 0:
+                            if (!userList.signUp(userName, password,
+                                    new File("Chess/resource/image/defaultAvatar.png"))) {
+                                JOptionPane.showMessageDialog(this, "User exist");
+                            }
+                            break;
+                        case 1:
+                            JFileChooser jfc = new JFileChooser("Chess/resource/image/");
+                            jfc.setAcceptAllFileFilterUsed(false);
+                            FileNameExtensionFilter fnef = new FileNameExtensionFilter("image", "jpg", "jpeg", "png");
+                            jfc.addChoosableFileFilter(fnef);
+                            userList.signUp(userName, password, jfc.getSelectedFile());
+                    }
+                }
+            }
+        });
+    }
+
+    private void addBackgroundButtom() {
+        JButton button = new JButton("Change background");
+        button.setLocation(150, 10);
+        button.setSize(50, 50);
+        button.setFont(new Font("Rockwell", Font.BOLD, 20));
+        menu.add(button);
+        button.addActionListener(e -> {
+            System.out.println("Change background");
+            String[] options = { "1", "2" };
+            String buff = JOptionPane.showInputDialog(this, "Choose a background", " Background setting",
+                    JOptionPane.INFORMATION_MESSAGE, null, options, options[0]).toString();
+            background = new File("Chess/resource/image/background" + buff + ".png");
+            repaint();
         });
     }
 
@@ -93,48 +224,61 @@ public class ChessGameFrame extends JFrame {
         Chessboard chessboard = new Chessboard(CHESSBOARD_SIZE, CHESSBOARD_SIZE, this);
         gameController = new GameController(chessboard);
         chessboard.setLocation(HEIGTH / 10, HEIGTH / 10);
-        add(chessboard);
+        game.add(chessboard);
     }
 
     /**
      * 在游戏面板中添加标签
      */
-    private void addLabel() {
+    private void addColorLabel() {
         statusLabel = new JLabel("WHITE");
         statusLabel.setLocation(HEIGTH, HEIGTH / 10);
         statusLabel.setSize(200, 60);
         statusLabel.setFont(new Font("Rockwell", Font.BOLD, 20));
-        add(statusLabel);
+        statusLabel.setForeground(Color.WHITE);
+        game.add(statusLabel);
     }
 
-    public void changeLable(String color) {
+    public void changeColorLable(String color) {
         statusLabel.setText(color);
     }
 
-    /**
-     * 在游戏面板中增加一个按钮，如果按下的话就会显示Hello, world!
-     */
+    public void addCountdownLabel(boolean start) {
+        if (start) {
+            countdownLabel.setLocation(HEIGTH, HEIGTH / 10 + 60);
+            countdownLabel.setSize(200, 60);
+            countdownLabel.setFont(new Font("Rockwell", Font.BOLD, 20));
+            countdownLabel.setForeground(Color.WHITE);
+            countdownLabel.setText(new SimpleDateFormat("mm:ss").format(5 * 1000));
 
-    // private void addHelloButton() {
-    // JButton button = new JButton("Show Hello Here");
-    // button.addActionListener((e) -> JOptionPane.showMessageDialog(this, "Hello,
-    // world!"));
-    // button.setLocation(HEIGTH, HEIGTH / 10 + 120);
-    // button.setSize(200, 60);
-    // button.setFont(new Font("Rockwell", Font.BOLD, 20));
-    // add(button);
-    // }
+            timer = new javax.swing.Timer(1000, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    String[] buff = countdownLabel.getText().split(":");
+                    int timeleft = Integer.parseInt(buff[0]) * 60 * 1000 + Integer.parseInt(buff[1]) * 1000 - 1000;
+                    countdownLabel.setText(new SimpleDateFormat("mm:ss").format(timeleft));
+                    game.add(countdownLabel);
+                    if (timeleft == 0) {
+                        gameController.forceSwapColor();
+                    }
+                }
+            });
+            timer.start();
+        } else {
+            timer.stop();
+        }
+    }
 
     private void addLoadButton() {
         JButton button = new JButton("Load");
         button.setLocation(HEIGTH, HEIGTH / 10 + 240);
         button.setSize(200, 60);
         button.setFont(new Font("Rockwell", Font.BOLD, 20));
-        add(button);
+        game.add(button);
 
         button.addActionListener(e -> {
             System.out.println("Click load");
-            JFileChooser jfc = new JFileChooser("resource");
+            JFileChooser jfc = new JFileChooser("Chess/resource/save");
             jfc.setAcceptAllFileFilterUsed(false);
             FileNameExtensionFilter fnef = new FileNameExtensionFilter("txt", "txt");
             jfc.addChoosableFileFilter(fnef);
@@ -149,11 +293,11 @@ public class ChessGameFrame extends JFrame {
         button.setLocation(HEIGTH, HEIGTH / 10 + 360);
         button.setSize(200, 60);
         button.setFont(new Font("Rockwell", Font.BOLD, 20));
-        add(button);
+        game.add(button);
 
         button.addActionListener(e -> {
             System.out.println("Click save");
-            JFileChooser jfc = new JFileChooser("resource");
+            JFileChooser jfc = new JFileChooser("Chess/resource/save");
             jfc.setAcceptAllFileFilterUsed(false);
             FileNameExtensionFilter fnef = new FileNameExtensionFilter("txt", "txt");
             jfc.addChoosableFileFilter(fnef);
@@ -169,7 +313,7 @@ public class ChessGameFrame extends JFrame {
         button.setLocation(HEIGTH, HEIGTH / 10 + 480);
         button.setSize(200, 60);
         button.setFont(new Font("Rockwell", Font.BOLD, 20));
-        add(button);
+        game.add(button);
 
         button.addActionListener(e -> {
             System.out.println("Click reset");
@@ -177,6 +321,40 @@ public class ChessGameFrame extends JFrame {
                 gameController.resetGame();
             }
         });
+    }
+
+    private void addMenuButton() {
+        JButton button = new JButton("Menu");
+        button.setLocation(HEIGTH, HEIGTH / 10 + 540);
+        button.setSize(200, 60);
+        button.setFont(new Font("Rockwell", Font.BOLD, 20));
+        game.add(button);
+
+        button.addActionListener(e -> {
+            System.out.println("Click menu");
+            gameController.resetGame();
+            card.show(this.getContentPane(), "Menu");
+            addCountdownLabel(false);
+        });
+    }
+
+    protected void musicPlayer(String musicFile, boolean loop) {
+        File music = new File("Chess/resource/music/" + musicFile);
+        try {
+            AudioInputStream ais = AudioSystem.getAudioInputStream(music);
+            Clip clip = AudioSystem.getClip();
+            clip.open(ais);
+            if (loop) {
+                clip.loop(Clip.LOOP_CONTINUOUSLY);
+            }
+            clip.start();
+        } catch (UnsupportedAudioFileException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (LineUnavailableException e) {
+            e.printStackTrace();
+        }
     }
 
 }

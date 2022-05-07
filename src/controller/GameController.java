@@ -9,8 +9,15 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.util.List;
 
+import model.ChessColor;
+import model.User;
+import model.UserAI;
+
 public class GameController {
     private Chessboard chessboard;
+    private User userW;
+    private User userB;
+    private UserAI userAI;
 
     public GameController(Chessboard chessboard) {
         this.chessboard = chessboard;
@@ -27,7 +34,7 @@ public class GameController {
         return null;
     }
 
-    public int saveGameToFile(File save) {        
+    public int saveGameToFile(File save) {
         try {
             save.createNewFile();
             Writer writer;
@@ -35,9 +42,9 @@ public class GameController {
             for (String str : chessboard.getSteps()) {
                 writer.write(str);
             }
-            for(int i=0;i<chessboard.getChessComponents().length;i++){
-                for(int j=0;j<chessboard.getChessComponents()[i].length;j++){
-                    writer.write(chessboard.getChessComponents()[i][j].getName()+" ");
+            for (int i = 0; i < chessboard.getChessComponents().length; i++) {
+                for (int j = 0; j < chessboard.getChessComponents()[i].length; j++) {
+                    writer.write(chessboard.getChessComponents()[i][j].getName() + " ");
                 }
                 writer.write("\r\n");
             }
@@ -49,18 +56,30 @@ public class GameController {
         System.err.println(save + "is created");
         return 0;
     }
+    public void forceSwapColor(){
+        chessboard.swapColor();
+    }
 
     public void resetGame() {
         chessboard.resetGame();
     }
 
-    public String[] getSaveList() {
-        File file = new File("resource");
-        String[] saveList = file.list();
-        for (int i = 0; i < saveList.length; i++) {
-            saveList[i] = saveList[i].substring(0, saveList[i].lastIndexOf("."));
+    public void setUser(User userW, User userB) {
+        this.userW = userW;
+        this.userB = userB;
+    }
+
+    public void setUser(User userW) {
+        this.userW = userW;
+        this.userB = userAI;
+    }
+
+    public void winCount(ChessColor color) {
+        if (color.equals(ChessColor.WHITE)) {
+            userW.winCount();
+        } else {
+            userB.winCount();
         }
-        return saveList;
     }
 
 }

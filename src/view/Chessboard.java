@@ -89,19 +89,15 @@ public class Chessboard extends JComponent {
 
         chess1.repaint();
         chess2.repaint();
+        chessGameFrame.musicPlayer("chessSound.wav", false);
     }
 
     public void saveStepToFile(ChessComponent first, ChessComponent chessComponent) {
-        String format;
-        if (currentColor.getName().equals("Black")) {
-            format = "\r\n";
-        } else {
-            format = " ";
-        }
-        String step = first.getName() + String.valueOf((char) (first.getChessboardPoint().getX() + 97))
+        String step = first.getChessColor().getName().substring(0, 1) + first.getName()
+                + String.valueOf((char) (first.getChessboardPoint().getX() + 97))
                 + String.valueOf(first.getChessboardPoint().getY())
                 + String.valueOf((char) (chessComponent.getChessboardPoint().getX() + 97))
-                + String.valueOf(chessComponent.getChessboardPoint().getY()) + format;
+                + String.valueOf(chessComponent.getChessboardPoint().getY()) + "\n";
         steps.add(step);
     }
 
@@ -116,7 +112,9 @@ public class Chessboard extends JComponent {
 
     public void swapColor() {
         currentColor = currentColor == ChessColor.BLACK ? ChessColor.WHITE : ChessColor.BLACK;
-        chessGameFrame.changeLable(currentColor.toString());
+        chessGameFrame.changeColorLable(currentColor.toString());
+        chessGameFrame.addCountdownLabel(false);
+        chessGameFrame.addCountdownLabel(true);
     }
 
     private void initRookOnBoard(int row, int col, ChessColor color) {
@@ -138,19 +136,31 @@ public class Chessboard extends JComponent {
 
     public void loadGame(List<String> chessData) {
         resetGame();
-        tag: for (String arg : chessData) {
-            while (!arg.equals("end")) {
+        for (String arg : chessData) {
+            if (!arg.equals("end")) {
                 if (arg.matches("regex")) {
-                    int col1 = arg.charAt(1) - 'a', row1 = arg.charAt(2) - '0';
-                    int col2 = arg.charAt(3) - 'a', row2 = arg.charAt(4) - '0';
+                    JOptionPane.showMessageDialog(chessGameFrame, "Wrong save");
+                    break;
+                }
+                Color color;
+                if (arg.charAt(0) == 'B') {
+                    color = Color.BLACK;
+                } else {
+                    color = Color.WHITE;
+                }
+                if (getCurrentColor().equals(color)) {
+                    int col1 = arg.charAt(2) - 'a', row1 = arg.charAt(3) - '0';
+                    int col2 = arg.charAt(4) - 'a', row2 = arg.charAt(5) - '0';
                     ChessComponent chess1 = chessComponents[col1][row1], chess2 = chessComponents[col2][row2];
-                    if (chess2.getChessColor() == getCurrentColor() && chess2.getChessColor() != getCurrentColor() &&
-                            chess1.canMoveTo(getChessComponents(), chess2.getChessboardPoint())) {
+                    if (chess2.getChessColor() != getCurrentColor() || chess2.getChessColor() == getCurrentColor() ||
+                            !chess1.canMoveTo(getChessComponents(), chess2.getChessboardPoint())) {
                         JOptionPane.showMessageDialog(chessGameFrame, "Wrong save");
-                        break tag;
+                        break;
                     }
                     swapChessComponents(chess1, chess2);
                     swapColor();
+                } else {
+                    break;
                 }
             }
         }
@@ -167,6 +177,9 @@ public class Chessboard extends JComponent {
                 chessComponents[i][j].repaint();
             }
         }
-        currentColor = ChessColor.BLACK;
+        currentColor = ChessColor.WHITE;
+        chessGameFrame.addCountdownLabel(false);
+        chessGameFrame.addCountdownLabel(true);
+        chessGameFrame.changeColorLable(currentColor.toString());
     }
 }
