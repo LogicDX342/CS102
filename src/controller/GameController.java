@@ -26,7 +26,7 @@ public class GameController {
     public List<String> loadGameFromFile(File save) {
         try {
             List<String> chessData = Files.readAllLines(save.toPath());
-            chessboard.loadGame(chessData);
+            // chessboard.loadGame(chessData);
             return chessData;
         } catch (IOException e) {
             e.printStackTrace();

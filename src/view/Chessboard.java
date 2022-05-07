@@ -159,9 +159,9 @@ public class Chessboard extends JComponent {
                     }
                     swapChessComponents(chess1, chess2);
                     swapColor();
-                } else {
-                    break;
                 }
+            } else {
+                break;
             }
         }
     }
