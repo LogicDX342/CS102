@@ -1,8 +1,5 @@
 package controller;
 
-import java.io.File;
-import java.util.ArrayList;
-
 import model.ChessComponent;
 import view.Chessboard;
 
@@ -53,7 +50,7 @@ public class ClickController {
      */
 
     private boolean handleSecond(ChessComponent chessComponent) {
-        return chessComponent.getChessColor() != chessboard.getCurrentColor() &&
+        return chessComponent.getChessColor() != first.getChessColor() &&
                 first.canMoveTo(chessboard.getChessComponents(), chessComponent.getChessboardPoint());
     }
 

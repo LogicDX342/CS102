@@ -38,6 +38,7 @@ public abstract class ChessComponent extends JComponent {
     private ChessboardPoint chessboardPoint;
     protected final ChessColor chessColor;
     private boolean selected;
+    private boolean placed;
 
     protected ChessComponent(ChessboardPoint chessboardPoint, Point location, ChessColor chessColor, ClickController clickController, int size) {
         enableEvents(AWTEvent.MOUSE_EVENT_MASK);
@@ -68,6 +69,13 @@ public abstract class ChessComponent extends JComponent {
     public void setSelected(boolean selected) {
         this.selected = selected;
     }
+    public boolean isPlaced() {
+        return placed;
+    }
+
+    public void setPlaced(boolean placed) {
+        this.placed = placed;
+    }
 
     /**
      * @param another 主要用于和另外一个棋子交换位置
@@ -96,6 +104,16 @@ public abstract class ChessComponent extends JComponent {
             System.out.printf("Click [%d,%d]\n", chessboardPoint.getX(), chessboardPoint.getY());
             clickController.onClick(this);
         }
+        if(e.getID()==MouseEvent.MOUSE_ENTERED){
+            System.out.printf("Place [%d,%d]\n", chessboardPoint.getX(), chessboardPoint.getY());
+            placed=true;
+            repaint();
+        }
+        if(e.getID()==MouseEvent.MOUSE_EXITED){
+            System.out.printf("Place [%d,%d]\n", chessboardPoint.getX(), chessboardPoint.getY());
+            placed=false;
+            repaint();
+        }
     }
 
     /**
@@ -119,7 +137,10 @@ public abstract class ChessComponent extends JComponent {
         super.paintComponents(g);
         System.out.printf("repaint chess [%d,%d]\n", chessboardPoint.getX(), chessboardPoint.getY());
         Color squareColor = BACKGROUND_COLORS[(chessboardPoint.getX() + chessboardPoint.getY()) % 2];
-        g.setColor(squareColor);
+        if(placed){
+            g.setColor(Color.BLUE);
+        }else
+        {g.setColor(squareColor);}
         g.fillRect(0, 0, this.getWidth(), this.getHeight());
     }
 }
