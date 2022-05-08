@@ -25,6 +25,7 @@ public class GameController {
     public GameController(Chessboard chessboard) {
         this.chessboard = chessboard;
     }
+   
 
     public void linkStart() {
         server = new Server(this);
