@@ -26,7 +26,9 @@ public class ClickController {
                 first = null;
                 recordFirst.repaint();
             } else if (handleSecond(chessComponent)) {
-                //repaint in swap chess method.
+
+                // repaint in swap chess method.
+
                 chessboard.swapChessComponents(first, chessComponent);
                 chessboard.swapColor();
 
@@ -51,7 +53,10 @@ public class ClickController {
      */
 
     private boolean handleSecond(ChessComponent chessComponent) {
-        return chessComponent.getChessColor() != chessboard.getCurrentColor() &&
+        return chessComponent.getChessColor() != first.getChessColor() &&
                 first.canMoveTo(chessboard.getChessComponents(), chessComponent.getChessboardPoint());
     }
+
+    
+
 }

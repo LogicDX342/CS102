@@ -39,6 +39,9 @@ public abstract class ChessComponent extends JComponent {
     protected final ChessColor chessColor;
     private boolean selected;
 
+    private boolean placed;
+
+
     protected ChessComponent(ChessboardPoint chessboardPoint, Point location, ChessColor chessColor, ClickController clickController, int size) {
         enableEvents(AWTEvent.MOUSE_EVENT_MASK);
         setLocation(location);
@@ -69,6 +72,15 @@ public abstract class ChessComponent extends JComponent {
         this.selected = selected;
     }
 
+    public boolean isPlaced() {
+        return placed;
+    }
+
+    public void setPlaced(boolean placed) {
+        this.placed = placed;
+    }
+
+
     /**
      * @param another 主要用于和另外一个棋子交换位置
      *                <br>
@@ -96,6 +108,17 @@ public abstract class ChessComponent extends JComponent {
             System.out.printf("Click [%d,%d]\n", chessboardPoint.getX(), chessboardPoint.getY());
             clickController.onClick(this);
         }
+
+        if(e.getID()==MouseEvent.MOUSE_ENTERED){
+            System.out.printf("Place [%d,%d]\n", chessboardPoint.getX(), chessboardPoint.getY());
+            placed=true;
+            repaint();
+        }
+        if(e.getID()==MouseEvent.MOUSE_EXITED){
+            System.out.printf("Place [%d,%d]\n", chessboardPoint.getX(), chessboardPoint.getY());
+            placed=false;
+            repaint();
+        }
     }
 
     /**
@@ -115,11 +138,16 @@ public abstract class ChessComponent extends JComponent {
     public abstract void loadResource() throws IOException;
 
     @Override
-    protected void paintComponent(Graphics g) {//继承了java中的paintComponent方法
+
+    protected void paintComponent(Graphics g) {
         super.paintComponents(g);
         System.out.printf("repaint chess [%d,%d]\n", chessboardPoint.getX(), chessboardPoint.getY());
         Color squareColor = BACKGROUND_COLORS[(chessboardPoint.getX() + chessboardPoint.getY()) % 2];
-        g.setColor(squareColor);
+        if(placed){
+            g.setColor(Color.BLUE);
+        }else
+        {g.setColor(squareColor);}
+
         g.fillRect(0, 0, this.getWidth(), this.getHeight());
     }
 }
