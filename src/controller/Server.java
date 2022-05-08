@@ -11,8 +11,8 @@ public class Server {
     private Socket client;
     private GameController gameController;
 
-    public Server() {
-        // this.gameController = gameController;
+    public Server(GameController gameController) {
+        this.gameController = gameController;
         try {
             server = new ServerSocket(4242);
             client = server.accept();
@@ -21,17 +21,17 @@ public class Server {
         }
     }
 
-    public void recive() {
+    public String recive() {
         try {
             InputStream input = client.getInputStream();
             byte[] b = new byte[1024];
             int length = input.read(b);
             String step = new String(b, 0, length);
-            System.out.println(step);
-            // gameController.move(step);
+            return step; 
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return null;
     }
 
     public void send(String step) {

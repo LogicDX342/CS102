@@ -10,8 +10,8 @@ public class Client {
 	private GameController gameController;
 	private OutputStream output;
 
-	public Client(String host) {
-		// this.gameController = gameController;
+	public Client(String host,GameController gameController) {
+		this.gameController = gameController;
 		try {
 			client = new Socket(host, 4242);
 			System.out.println("Connected");

@@ -14,6 +14,8 @@ import java.awt.event.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 
 /**
@@ -98,6 +100,50 @@ public class ChessGameFrame extends JFrame {
         menu.add(button);
         button.addActionListener(e -> {
             System.out.println("Start game");
+            String[] optionsMode = { "Local", "Online", "AI" };
+            switch (JOptionPane.showOptionDialog(this, "Choose a mode", "Start game", JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.INFORMATION_MESSAGE, null, optionsMode, optionsMode[0])) {
+                case 0:
+                    String userName = JOptionPane.showInputDialog(this, "Input your username", "Sign in",
+                            JOptionPane.INFORMATION_MESSAGE);
+                    if (userName != null) {
+                        String password = JOptionPane.showInputDialog(this, "Input your password", "Sign in",
+                                JOptionPane.INFORMATION_MESSAGE);
+                        if (password != null) {
+                            boolean check = false;
+                            for (User user : userList.getUserList()) {
+                                if (user.getUserName().equals(userName)) {
+                                    if (user.checkPassword(password)) {
+                                        gameController.setUser(user);
+                                        check = true;
+                                    }
+                                }
+                            }
+                            if (check) {
+                                JOptionPane.showMessageDialog(this, "Successfully sign in");
+                            } else {
+                                JOptionPane.showMessageDialog(this, "Wrong username or password");
+                            }
+                        }
+                    }
+                case 1:
+                    try {
+                        InetAddress address = InetAddress.getLocalHost();
+                        gameController.linkStart();
+                        JOptionPane.showInputDialog(this,
+                                "Your address:" + address.getHostAddress() + "\nInput an address", "Start game",
+                                JOptionPane.INFORMATION_MESSAGE);
+                    } catch (UnknownHostException e1) {
+                        e1.printStackTrace();
+                    }
+                case 2:
+                    String[] optionsHardness = { "Simple", "Normal" };
+                    gameController.setHardness(JOptionPane.showOptionDialog(this, "Choose hardness", "Start game",
+                            JOptionPane.DEFAULT_OPTION,
+                            JOptionPane.INFORMATION_MESSAGE, null, optionsHardness, optionsHardness[0]));
+                    break;
+            }
+
             card.show(this.getContentPane(), "Game");
             addCountdownLabel(true);
         });
