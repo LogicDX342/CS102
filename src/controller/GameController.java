@@ -2,6 +2,7 @@ package controller;
 
 import view.Chessboard;
 
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -22,18 +23,19 @@ public class GameController {
     private UserAI userAI;
     private Server server;
 
+
     public GameController(Chessboard chessboard) {
         this.chessboard = chessboard;
     }
-   
 
     public void linkStart() {
         server = new Server(this);
-    }
+
 
     public List<String> loadGameFromFile(File save) {
         try {
             List<String> chessData = Files.readAllLines(save.toPath());
+
             chessboard.loadGame(chessData);
             return chessData;
         } catch (IOException e) {
@@ -115,5 +117,4 @@ public class GameController {
             userB.winCount();
         }
     }
-
 }

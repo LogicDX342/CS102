@@ -1,5 +1,6 @@
 package controller;
 
+
 import model.ChessComponent;
 import view.Chessboard;
 
@@ -25,7 +26,9 @@ public class ClickController {
                 first = null;
                 recordFirst.repaint();
             } else if (handleSecond(chessComponent)) {
+
                 // repaint in swap chess method.
+
                 chessboard.swapChessComponents(first, chessComponent);
                 chessboard.swapColor();
 
@@ -55,4 +58,5 @@ public class ClickController {
     }
 
     
+
 }
