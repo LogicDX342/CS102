@@ -2,7 +2,6 @@ package view;
 
 import controller.GameController;
 import model.User;
-
 import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -217,6 +216,7 @@ public class ChessGameFrame extends JFrame {
         });
     }
 
+
     /**
      * 在游戏面板中添加棋盘
      */
@@ -230,6 +230,7 @@ public class ChessGameFrame extends JFrame {
     /**
      * 在游戏面板中添加标签
      */
+
     private void addColorLabel() {
         statusLabel = new JLabel("WHITE");
         statusLabel.setLocation(HEIGTH, HEIGTH / 10);
@@ -274,6 +275,7 @@ public class ChessGameFrame extends JFrame {
         button.setLocation(HEIGTH, HEIGTH / 10 + 240);
         button.setSize(200, 60);
         button.setFont(new Font("Rockwell", Font.BOLD, 20));
+
         game.add(button);
 
         button.addActionListener(e -> {
@@ -356,5 +358,4 @@ public class ChessGameFrame extends JFrame {
             e.printStackTrace();
         }
     }
-
 }
