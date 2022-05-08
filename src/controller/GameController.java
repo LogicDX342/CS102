@@ -8,8 +8,10 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.util.List;
+import java.awt.*;
 
 import model.ChessColor;
+import model.ChessComponent;
 import model.User;
 import model.UserAI;
 
@@ -22,11 +24,15 @@ public class GameController {
     public GameController(Chessboard chessboard) {
         this.chessboard = chessboard;
     }
+    public void linkStart(){
+        Server server=new Server();
+        server.recive();
+    }
 
     public List<String> loadGameFromFile(File save) {
         try {
             List<String> chessData = Files.readAllLines(save.toPath());
-            // chessboard.loadGame(chessData);
+            chessboard.loadGame(chessData);
             return chessData;
         } catch (IOException e) {
             e.printStackTrace();
@@ -56,7 +62,25 @@ public class GameController {
         System.err.println(save + "is created");
         return 0;
     }
-    public void forceSwapColor(){
+
+    public void move(String step) {
+        Color color;
+        if (step.charAt(0) == 'B') {
+            color = Color.BLACK;
+        } else {
+            color = Color.WHITE;
+        }
+        if (chessboard.getCurrentColor().equals(color)) {
+            int col1 = step.charAt(2) - 'a', row1 = step.charAt(3) - '0';
+            int col2 = step.charAt(4) - 'a', row2 = step.charAt(5) - '0';
+            ChessComponent chess1 = chessboard.getChessComponents()[col1][row1],
+                    chess2 = chessboard.getChessComponents()[col2][row2];
+            chessboard.swapChessComponents(chess1, chess2);
+            chessboard.swapColor();
+        }
+    }
+
+    public void forceSwapColor() {
         chessboard.swapColor();
     }
 
