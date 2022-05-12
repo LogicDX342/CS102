@@ -1,1 +1,1 @@
-guest&#guest&#Chess/resource/image/defaultAvatar.png&#0&#0&#
+guest&#guest&#./resource/image/defaultAvatar.png&#0&#0&#

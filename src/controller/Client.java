@@ -7,11 +7,10 @@ import java.net.Socket;
 
 public class Client {
 	private Socket client;
-	private GameController gameController;
+	private InputStream input;
 	private OutputStream output;
 
-	public Client(String host,GameController gameController) {
-		this.gameController = gameController;
+	public Client(String host) {
 		try {
 			client = new Socket(host, 4242);
 			System.out.println("Connected");
@@ -21,18 +20,17 @@ public class Client {
 		}
 	}
 
-	public void recive() {
+	public String receive() {
 		try {
-			InputStream input = client.getInputStream();
+			input = client.getInputStream();
 			byte[] b = new byte[1024];
 			int length = input.read(b);
 			String step = new String(b, 0, length);
-			// gameController.move(step);
-			System.out.println(step);
-
+			return step;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		return null;
 	}
 
 	public void send(String step) {

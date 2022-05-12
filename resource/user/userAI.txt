@@ -1,1 +1,1 @@
-userAI&#userAI&#Chess/resource/image/aiAvatar.png&#-1&#1&#
+userAI&#userAI&#.\resource\image\aiAvatar.png&#-1&#0&#

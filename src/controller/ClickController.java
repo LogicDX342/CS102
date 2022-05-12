@@ -1,6 +1,5 @@
 package controller;
 
-
 import model.ChessComponent;
 import view.Chessboard;
 
@@ -16,21 +15,25 @@ public class ClickController {
         if (first == null) {
             if (handleFirst(chessComponent)) {
                 chessComponent.setSelected(true);
+                chessboard.showTargeted(chessComponent);
                 first = chessComponent;
                 first.repaint();
             }
         } else {
             if (first == chessComponent) { // 再次点击取消选取
                 chessComponent.setSelected(false);
+                chessboard.hideTargeted();
                 ChessComponent recordFirst = first;
                 first = null;
                 recordFirst.repaint();
             } else if (handleSecond(chessComponent)) {
-
+                if (first.getType() == 'P') {
+                    first.setTwoBlock();
+                }
                 // repaint in swap chess method.
-
-                chessboard.swapChessComponents(first, chessComponent);
+                chessboard.hideTargeted();
                 chessboard.swapColor();
+                chessboard.swapChessComponents(first, chessComponent,true);
 
                 first.setSelected(false);
                 first = null;
@@ -56,7 +59,5 @@ public class ClickController {
         return chessComponent.getChessColor() != first.getChessColor() &&
                 first.canMoveTo(chessboard.getChessComponents(), chessComponent.getChessboardPoint());
     }
-
-    
 
 }

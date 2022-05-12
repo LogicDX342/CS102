@@ -16,7 +16,7 @@ public class UserList {
     private ArrayList<User> userList = new ArrayList<>();
 
     public UserList() {
-        File userList = new File("Chess/resource/user");
+        File userList = new File("./resource/user");
         File[] users = userList.listFiles();
         for (File user : users) {
             try {
@@ -32,7 +32,7 @@ public class UserList {
     }
 
     public boolean signUp(String userName, String password, File avatar) {
-        File userData = new File("Chess/resource/user/" + userName + ".txt");
+        File userData = new File("./resource/user/" + userName + ".txt");
         if (userData.exists()) {
             return false;
         }
