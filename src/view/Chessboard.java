@@ -1,14 +1,17 @@
 package view;
 
-import model.ChessColor;
-import model.ChessComponent;
-import model.EmptySlotComponent;
-import model.RookChessComponent;
+import model.*;
 import controller.ClickController;
+import controller.GameController;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import javax.swing.Timer;
 
 /**
  * 这个类表示面板上的棋盘组件对象
@@ -34,6 +37,9 @@ public class Chessboard extends JComponent {
     private final int CHESS_SIZE;
     private ArrayList<String> steps = new ArrayList<String>();
     private ChessGameFrame chessGameFrame;
+    private GameController gameController;
+    private Timer timer;
+    private boolean delay;
 
     public Chessboard(int width, int height, ChessGameFrame chessGameFrame) {
         setLayout(null); // Use absolute layout.
@@ -44,7 +50,6 @@ public class Chessboard extends JComponent {
         System.out.printf("chessboard size = %d, chess size = %d\n", width, CHESS_SIZE);
 
         initiateEmptyChessboard();
-
 
         // FIXME: Initialize chessboard for testing only.
         initRookOnBoard(0, 0, ChessColor.BLACK);
@@ -82,6 +87,10 @@ public class Chessboard extends JComponent {
         initPawnOnBoard(CHESSBOARD_SIZE - 2, 7, ChessColor.WHITE);
     }
 
+    public void setGameController(GameController gameController) {
+        this.gameController = gameController;
+    }
+
     public ChessComponent[][] getChessComponents() {
         return chessComponents;
     }
@@ -103,9 +112,10 @@ public class Chessboard extends JComponent {
         add(chessComponents[row][col] = chessComponent);
     }
 
-    public void swapChessComponents(ChessComponent chess1, ChessComponent chess2) {
+    public void swapChessComponents(ChessComponent chess1, ChessComponent chess2, boolean online) {
 
         saveStepToFile(chess1, chess2);
+
         // Note that chess1 has higher priority, 'destroys' chess2 if exists.
         if (!(chess2 instanceof EmptySlotComponent)) {
             remove(chess2);
@@ -119,18 +129,25 @@ public class Chessboard extends JComponent {
         int row2 = chess2.getChessboardPoint().getX(), col2 = chess2.getChessboardPoint().getY();
         chessComponents[row2][col2] = chess2;
 
+        // \ chess1.paintImmediately(chess1.getX(), chess1.getY(), chess1.getWidth(),
+        // chess1.getHeight());
+        // chess2.paintImmediately(chess2.getX(), chess2.getY(), chess2.getWidth(),
+        // chess2.getHeight());
         chess1.repaint();
         chess2.repaint();
+        if (online) {
+            gameController.sendStep(steps.get(steps.size() - 1));
+        }
 
         chessGameFrame.musicPlayer("chessSound.wav", false);
     }
 
     public void saveStepToFile(ChessComponent first, ChessComponent chessComponent) {
-        String step = first.getChessColor().getName().substring(0, 1) + first.getName()
+        String step = first.getChessColor().getName().substring(0, 1) + first.getType()
                 + String.valueOf((char) (first.getChessboardPoint().getX() + 97))
                 + String.valueOf(first.getChessboardPoint().getY())
                 + String.valueOf((char) (chessComponent.getChessboardPoint().getX() + 97))
-                + String.valueOf(chessComponent.getChessboardPoint().getY()) + "\n";
+                + String.valueOf(chessComponent.getChessboardPoint().getY());
         steps.add(step);
     }
 
@@ -146,43 +163,49 @@ public class Chessboard extends JComponent {
 
     public void swapColor() {
         currentColor = currentColor == ChessColor.BLACK ? ChessColor.WHITE : ChessColor.BLACK;
-chessGameFrame.changeColorLable(currentColor.toString());
+        chessGameFrame.changeColorLabel(currentColor.toString());
         chessGameFrame.addCountdownLabel(false);
         chessGameFrame.addCountdownLabel(true);
     }
 
     private void initRookOnBoard(int row, int col, ChessColor color) {
-        ChessComponent chessComponent = new RookChessComponent(new ChessboardPoint(row, col), calculatePoint(row, col), color, clickController, CHESS_SIZE);
+        ChessComponent chessComponent = new RookChessComponent(new ChessboardPoint(row, col), calculatePoint(row, col),
+                color, clickController, CHESS_SIZE);
         chessComponent.setVisible(true);
         putChessOnBoard(chessComponent);
     }
 
     private void initKnightOnBoard(int row, int col, ChessColor color) {
-        ChessComponent chessComponent = new KnightChessComponent(new ChessboardPoint(row, col), calculatePoint(row, col), color, clickController, CHESS_SIZE);
+        ChessComponent chessComponent = new KnightChessComponent(new ChessboardPoint(row, col),
+                calculatePoint(row, col), color, clickController, CHESS_SIZE);
         chessComponent.setVisible(true);
         putChessOnBoard(chessComponent);
     }
 
     private void initBishopOnBoard(int row, int col, ChessColor color) {
-        ChessComponent chessComponent = new BishopChessComponent(new ChessboardPoint(row, col), calculatePoint(row, col), color, clickController, CHESS_SIZE);
+        ChessComponent chessComponent = new BishopChessComponent(new ChessboardPoint(row, col),
+                calculatePoint(row, col), color, clickController, CHESS_SIZE);
         chessComponent.setVisible(true);
         putChessOnBoard(chessComponent);
     }
 
     private void initQueenOnBoard(int row, int col, ChessColor color) {
-        ChessComponent chessComponent = new QueenChessComponent(new ChessboardPoint(row, col), calculatePoint(row, col), color, clickController, CHESS_SIZE);
+        ChessComponent chessComponent = new QueenChessComponent(new ChessboardPoint(row, col), calculatePoint(row, col),
+                color, clickController, CHESS_SIZE);
         chessComponent.setVisible(true);
         putChessOnBoard(chessComponent);
     }
 
     private void initKingOnBoard(int row, int col, ChessColor color) {
-        ChessComponent chessComponent = new KingChessComponent(new ChessboardPoint(row, col), calculatePoint(row, col), color, clickController, CHESS_SIZE);
+        ChessComponent chessComponent = new KingChessComponent(new ChessboardPoint(row, col), calculatePoint(row, col),
+                color, clickController, CHESS_SIZE);
         chessComponent.setVisible(true);
         putChessOnBoard(chessComponent);
     }
 
     private void initPawnOnBoard(int row, int col, ChessColor color) {
-        ChessComponent chessComponent = new PawnChessComponent(new ChessboardPoint(row, col), calculatePoint(row, col), color, clickController, CHESS_SIZE);
+        ChessComponent chessComponent = new PawnChessComponent(new ChessboardPoint(row, col), calculatePoint(row, col),
+                color, clickController, CHESS_SIZE);
 
         chessComponent.setVisible(true);
         putChessOnBoard(chessComponent);
@@ -198,41 +221,90 @@ chessGameFrame.changeColorLable(currentColor.toString());
         return new Point(col * CHESS_SIZE, row * CHESS_SIZE);
     }
 
-    public void loadGame(List<String> chessData) {
-
-        resetGame();
-        for (String arg : chessData) {
-            if (!arg.equals("end")) {
-                if (arg.matches("regex")) {
-                    JOptionPane.showMessageDialog(chessGameFrame, "Wrong save");
-                    break;
-                }
-                Color color;
-                if (arg.charAt(0) == 'B') {
-                    color = Color.BLACK;
-                } else {
-                    color = Color.WHITE;
-                }
-                if (getCurrentColor().equals(color)) {
-                    int col1 = arg.charAt(2) - 'a', row1 = arg.charAt(3) - '0';
-                    int col2 = arg.charAt(4) - 'a', row2 = arg.charAt(5) - '0';
-                    ChessComponent chess1 = chessComponents[col1][row1], chess2 = chessComponents[col2][row2];
-                    if (chess2.getChessColor() != getCurrentColor() || chess2.getChessColor() == getCurrentColor() ||
-                            !chess1.canMoveTo(getChessComponents(), chess2.getChessboardPoint())) {
-                        JOptionPane.showMessageDialog(chessGameFrame, "Wrong save");
-                        break;
-                    }
-                    swapChessComponents(chess1, chess2);
-                    swapColor();
-                } else {
-                    break;
-                }
-            } else {
-                break;
+    public void showTargeted(ChessComponent chess) {
+        for (int i = 0; i < chessComponents.length; i++) {
+            for (int j = 0; j < chessComponents[i].length; j++) {
+                if (chess.canMoveTo(chessComponents, new ChessboardPoint(i, j))
+                        && !chessComponents[i][j].getChessColor().equals(chess.getChessColor()))
+                    chessComponents[i][j].setTargeted(true);
+                chessComponents[i][j].repaint();
             }
         }
     }
-    
+
+    public void hideTargeted() {
+        for (int i = 0; i < chessComponents.length; i++) {
+            for (int j = 0; j < chessComponents[i].length; j++) {
+                chessComponents[i][j].setTargeted(false);
+                chessComponents[i][j].repaint();
+            }
+        }
+    }
+
+    Thread thread;
+
+    public void loadGame(List<String> chessData) {
+        resetGame();
+        Thread thread2 = new Thread() {
+            @Override
+            public void run() {
+                for (String arg : chessData) {
+                    if (!arg.equals("end")) {
+                        if (!arg.matches("^[WB][BKNPQR][a-h][0-7][a-h][0-7]")) {
+                            JOptionPane.showMessageDialog(chessGameFrame, "Wrong save");
+                            break;
+                        }
+                        Color color;
+                        if (arg.charAt(0) == 'B') {
+                            color = Color.BLACK;
+                        } else {
+                            color = Color.WHITE;
+                        }
+                        if (getCurrentColor().getColor().equals(color)) {
+                            int col1 = arg.charAt(2) - 'a', row1 = arg.charAt(3) - '0';
+                            int col2 = arg.charAt(4) - 'a', row2 = arg.charAt(5) - '0';
+                            ChessComponent chess1 = chessComponents[col1][row1], chess2 = chessComponents[col2][row2];
+                            if (chess1.getChessColor() != getCurrentColor()
+                                    || chess2.getChessColor() == getCurrentColor() ||
+                                    !chess1.canMoveTo(getChessComponents(), chess2.getChessboardPoint())) {
+                                JOptionPane.showMessageDialog(chessGameFrame, "Wrong save");
+                                break;
+                            }
+                            if (delay) {
+                                thread = new Thread() {
+                                    @Override
+                                    public void run() {
+                                        swapChessComponents(chess1, chess2, false);
+                                        swapColor();
+                                    }
+                                };
+                                thread.start();
+                                try {
+                                    TimeUnit.SECONDS.sleep(2);
+                                    // Thread.sleep(delay);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            } else {
+                                swapChessComponents(chess1, chess2, false);
+                                swapColor();
+                            }
+                        } else {
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+                setDelay(false);
+            }
+        };
+        thread2.start();
+    }
+
+    public void setDelay(boolean set) {
+        delay = set;
+    }
 
     public void resetGame() {
         initiateEmptyChessboard();
@@ -240,15 +312,44 @@ chessGameFrame.changeColorLable(currentColor.toString());
         initRookOnBoard(0, CHESSBOARD_SIZE - 1, ChessColor.BLACK);
         initRookOnBoard(CHESSBOARD_SIZE - 1, 0, ChessColor.WHITE);
         initRookOnBoard(CHESSBOARD_SIZE - 1, CHESSBOARD_SIZE - 1, ChessColor.WHITE);
+        initKnightOnBoard(0, 1, ChessColor.BLACK);
+        initKnightOnBoard(0, CHESSBOARD_SIZE - 2, ChessColor.BLACK);
+        initKnightOnBoard(CHESSBOARD_SIZE - 1, 1, ChessColor.WHITE);
+        initKnightOnBoard(CHESSBOARD_SIZE - 1, CHESSBOARD_SIZE - 2, ChessColor.WHITE);
+        initBishopOnBoard(0, 2, ChessColor.BLACK);
+        initBishopOnBoard(0, CHESSBOARD_SIZE - 3, ChessColor.BLACK);
+        initBishopOnBoard(CHESSBOARD_SIZE - 1, 2, ChessColor.WHITE);
+        initBishopOnBoard(CHESSBOARD_SIZE - 1, CHESSBOARD_SIZE - 3, ChessColor.WHITE);
+        initQueenOnBoard(0, 3, ChessColor.BLACK);
+        initQueenOnBoard(CHESSBOARD_SIZE - 1, 3, ChessColor.WHITE);
+        initKingOnBoard(0, 4, ChessColor.BLACK);
+        initKingOnBoard(CHESSBOARD_SIZE - 1, 4, ChessColor.WHITE);
+        initPawnOnBoard(1, 0, ChessColor.BLACK);
+        initPawnOnBoard(1, 1, ChessColor.BLACK);
+        initPawnOnBoard(1, 2, ChessColor.BLACK);
+        initPawnOnBoard(1, 3, ChessColor.BLACK);
+        initPawnOnBoard(1, 4, ChessColor.BLACK);
+        initPawnOnBoard(1, 5, ChessColor.BLACK);
+        initPawnOnBoard(1, 6, ChessColor.BLACK);
+        initPawnOnBoard(1, 7, ChessColor.BLACK);
+        initPawnOnBoard(CHESSBOARD_SIZE - 2, 0, ChessColor.WHITE);
+        initPawnOnBoard(CHESSBOARD_SIZE - 2, 1, ChessColor.WHITE);
+        initPawnOnBoard(CHESSBOARD_SIZE - 2, 2, ChessColor.WHITE);
+        initPawnOnBoard(CHESSBOARD_SIZE - 2, 3, ChessColor.WHITE);
+        initPawnOnBoard(CHESSBOARD_SIZE - 2, 4, ChessColor.WHITE);
+        initPawnOnBoard(CHESSBOARD_SIZE - 2, 5, ChessColor.WHITE);
+        initPawnOnBoard(CHESSBOARD_SIZE - 2, 6, ChessColor.WHITE);
+        initPawnOnBoard(CHESSBOARD_SIZE - 2, 7, ChessColor.WHITE);
         for (int i = 0; i < chessComponents.length; i++) {
             for (int j = 0; j < chessComponents[i].length; j++) {
                 chessComponents[i][j].repaint();
             }
         }
+        steps = new ArrayList<>();
         currentColor = ChessColor.WHITE;
         chessGameFrame.addCountdownLabel(false);
         chessGameFrame.addCountdownLabel(true);
-        chessGameFrame.changeColorLable(currentColor.toString());
+        chessGameFrame.changeColorLabel(currentColor.toString());
 
     }
 }

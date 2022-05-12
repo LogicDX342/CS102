@@ -6,7 +6,7 @@ import java.io.IOException;
 public class UserAI extends User {
 
     public UserAI() {
-        super("userAI", "userAI", new File("Chess/resource/image/aiAvatar.png"), -1);
+        super("userAI", "userAI", new File("./resource/image/aiAvatar.png"), -1);
     }
 
     public UserAI(String userName, String password, String avatar, String ID, String winTimes) throws IOException {

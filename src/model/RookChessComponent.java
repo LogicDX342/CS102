@@ -32,14 +32,13 @@ public class RookChessComponent extends ChessComponent {
      */
     public void loadResource() throws IOException {
         if (ROOK_WHITE == null) {
-            ROOK_WHITE = ImageIO.read(new File("Chess/resource/image/rook-white.png"));
+            ROOK_WHITE = ImageIO.read(new File("./resource/image/rook-white.png"));
         }
 
         if (ROOK_BLACK == null) {
-            ROOK_BLACK = ImageIO.read(new File("Chess/resource/image/rook-black.png"));
+            ROOK_BLACK = ImageIO.read(new File("./resource/image/rook-black.png"));
         }
     }
-
 
     /**
      * 在构造棋子对象的时候，调用此方法以根据颜色确定rookImage的图片是哪一种
@@ -60,9 +59,18 @@ public class RookChessComponent extends ChessComponent {
         }
     }
 
-    public RookChessComponent(ChessboardPoint chessboardPoint, Point location, ChessColor color, ClickController listener, int size) {
+    public RookChessComponent(ChessboardPoint chessboardPoint, Point location, ChessColor color,
+            ClickController listener, int size) {
         super(chessboardPoint, location, color, listener, size);
         initiateRookImage(color);
+    }
+
+    @Override
+    public char getType() {
+        return 'R';
+    }
+
+    public void setTwoBlock() {
     }
 
     /**
@@ -78,16 +86,16 @@ public class RookChessComponent extends ChessComponent {
         ChessboardPoint source = getChessboardPoint();
         if (source.getX() == destination.getX()) {
             int row = source.getX();
-            for (int col = Math.min(source.getY(), destination.getY()) + 1;
-                 col < Math.max(source.getY(), destination.getY()); col++) {
+            for (int col = Math.min(source.getY(), destination.getY()) + 1; col < Math.max(source.getY(),
+                    destination.getY()); col++) {
                 if (!(chessComponents[row][col] instanceof EmptySlotComponent)) {
                     return false;
                 }
             }
         } else if (source.getY() == destination.getY()) {
             int col = source.getY();
-            for (int row = Math.min(source.getX(), destination.getX()) + 1;
-                 row < Math.max(source.getX(), destination.getX()); row++) {
+            for (int row = Math.min(source.getX(), destination.getX()) + 1; row < Math.max(source.getX(),
+                    destination.getX()); row++) {
                 if (!(chessComponents[row][col] instanceof EmptySlotComponent)) {
                     return false;
                 }
@@ -106,12 +114,12 @@ public class RookChessComponent extends ChessComponent {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-//        g.drawImage(rookImage, 0, 0, getWidth() - 13, getHeight() - 20, this);
-        g.drawImage(rookImage, 0, 0, getWidth() , getHeight(), this);
+        // g.drawImage(rookImage, 0, 0, getWidth() - 13, getHeight() - 20, this);
+        g.drawImage(rookImage, 0, 0, getWidth(), getHeight(), this);
         g.setColor(Color.BLACK);
         if (isSelected()) { // Highlights the model if selected.
             g.setColor(Color.RED);
-            g.drawOval(0, 0, getWidth() , getHeight());
+            g.drawOval(0, 0, getWidth(), getHeight());
         }
     }
 }

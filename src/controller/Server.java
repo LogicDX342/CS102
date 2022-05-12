@@ -9,10 +9,10 @@ import java.net.Socket;
 public class Server {
     private ServerSocket server;
     private Socket client;
-    private GameController gameController;
+    private InputStream input;
+    private  OutputStream output;
 
-    public Server(GameController gameController) {
-        this.gameController = gameController;
+    public Server() {
         try {
             server = new ServerSocket(4242);
             client = server.accept();
@@ -21,9 +21,9 @@ public class Server {
         }
     }
 
-    public String recive() {
+    public String receive() {
         try {
-            InputStream input = client.getInputStream();
+             input = client.getInputStream();
             byte[] b = new byte[1024];
             int length = input.read(b);
             String step = new String(b, 0, length);
@@ -36,7 +36,7 @@ public class Server {
 
     public void send(String step) {
         try {
-            OutputStream output = client.getOutputStream();
+            output = client.getOutputStream();
             output.write(step.getBytes());
         } catch (IOException e) {
             e.printStackTrace();

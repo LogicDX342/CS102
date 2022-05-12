@@ -19,10 +19,10 @@ public class User {
         this.avatar = avatar;
         try {
             this.ID = ID;
-            userData = new File("Chess/resource/user/" + userName + ".txt");
+            userData = new File("./resource/user/" + userName + ".txt");
             userData.createNewFile();
             Writer writer = new FileWriter(userData);
-            writer.write(userName + "&#" + password + "&#" + avatar.getAbsolutePath() + "&#" + ID + "&#" + winTimes);
+            writer.write(userName + "&#" + password + "&#" + avatar.getPath() + "&#" + ID + "&#" + winTimes+"&#");
             writer.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -43,7 +43,7 @@ public class User {
         Writer writer;
         try {
             writer = new FileWriter(userData);
-            writer.write(userName + "&#" + password + "&#" + avatar.getAbsolutePath() + "&#" + ID + "&#" + winTimes);
+            writer.write(userName + "&#" + password + "&#" + avatar.getPath() + "&#" + ID + "&#" + winTimes+"&#");
             writer.close();
         } catch (IOException e) {
             e.printStackTrace();

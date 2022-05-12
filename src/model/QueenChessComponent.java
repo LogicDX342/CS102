@@ -11,7 +11,7 @@ import java.io.IOException;
 /**
  * 这个类表示国际象棋里面的后
  */
-public class QueenChessComponent extends ChessComponent{
+public class QueenChessComponent extends ChessComponent {
     /**
      * 黑车和白车的图片，static使得其可以被所有车对象共享
      * <br>
@@ -32,11 +32,11 @@ public class QueenChessComponent extends ChessComponent{
      */
     public void loadResource() throws IOException {
         if (QUEEN_WHITE == null) {
-            QUEEN_WHITE = ImageIO.read(new File("./images/queen-white.png"));
+            QUEEN_WHITE = ImageIO.read(new File("./resource/image/queen-white.png"));
         }
 
         if (QUEEN_BLACK == null) {
-            QUEEN_BLACK = ImageIO.read(new File("./images/queen-black.png"));
+            QUEEN_BLACK = ImageIO.read(new File("./resource/image/queen-black.png"));
         }
     }
 
@@ -59,55 +59,56 @@ public class QueenChessComponent extends ChessComponent{
         }
     }
 
-    public QueenChessComponent(ChessboardPoint chessboardPoint, Point location, ChessColor color, ClickController listener, int size) {
+    public QueenChessComponent(ChessboardPoint chessboardPoint, Point location, ChessColor color,
+            ClickController listener, int size) {
         super(chessboardPoint, location, color, listener, size);
         initiateQueenImage(color);
     }
 
-    /**
-     * 车棋子的移动规则
-     *
-     * @param chessComponents 棋盘
-     * @param destination     目标位置，如(0, 0), (0, 7)等等
-     * @return 车棋子移动的合法性
-     */
+    @Override
+    public char getType() {
+        return 'Q';
+    }
+
+    public void setTwoBlock() {
+    }
 
     @Override
     public boolean canMoveTo(ChessComponent[][] chessComponents, ChessboardPoint destination) {
-        ChessboardPoint source = getChessboardPoint();//source:棋子走之前的坐标
-        if (source.getX() - source.getY() == destination.getX() - destination.getY()) {//向右上走
-            for (int col = Math.min(source.getY(), destination.getY()) + 1, row = Math.min(source.getX(), destination.getX()) + 1;
-                 col < Math.max(source.getY(), destination.getY()); col++, row++) {
+        ChessboardPoint source = getChessboardPoint();// source:棋子走之前的坐标
+        if (source.getX() - source.getY() == destination.getX() - destination.getY()) {// 向右上走
+            for (int col = Math.min(source.getY(), destination.getY()) + 1,
+                    row = Math.min(source.getX(), destination.getX()) + 1; col < Math.max(source.getY(),
+                            destination.getY()); col++, row++) {
                 if (!(chessComponents[row][col] instanceof EmptySlotComponent)) {
                     return false;
                 }
             }
-        } else if (source.getX() + source.getY() == destination.getX() + destination.getY()) {//向左上走
-            for (int col = Math.min(source.getY(), destination.getY()) + 1, row = Math.max(source.getX(), destination.getX()) - 1;
-                 col < Math.max(source.getY(), destination.getY()); col++, row--) {
+        } else if (source.getX() + source.getY() == destination.getX() + destination.getY()) {// 向左上走
+            for (int col = Math.min(source.getY(), destination.getY()) + 1,
+                    row = Math.max(source.getX(), destination.getX()) - 1; col < Math.max(source.getY(),
+                            destination.getY()); col++, row--) {
                 if (!(chessComponents[row][col] instanceof EmptySlotComponent)) {
                     return false;
                 }
             }
-        }
-        else if (source.getX() == destination.getX()) {
+        } else if (source.getX() == destination.getX()) {
             int row = source.getX();
-            for (int col = Math.min(source.getY(), destination.getY()) + 1;
-                 col < Math.max(source.getY(), destination.getY()); col++) {
+            for (int col = Math.min(source.getY(), destination.getY()) + 1; col < Math.max(source.getY(),
+                    destination.getY()); col++) {
                 if (!(chessComponents[row][col] instanceof EmptySlotComponent)) {
                     return false;
                 }
             }
         } else if (source.getY() == destination.getY()) {
             int col = source.getY();
-            for (int row = Math.min(source.getX(), destination.getX()) + 1;
-                 row < Math.max(source.getX(), destination.getX()); row++) {
+            for (int row = Math.min(source.getX(), destination.getX()) + 1; row < Math.max(source.getX(),
+                    destination.getX()); row++) {
                 if (!(chessComponents[row][col] instanceof EmptySlotComponent)) {
                     return false;
                 }
             }
-        }
-        else { // Not on the same row or the same column.
+        } else { // Not on the same row or the same column.
             return false;
         }
         return true;
@@ -121,12 +122,12 @@ public class QueenChessComponent extends ChessComponent{
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-//        g.drawImage(rookImage, 0, 0, getWidth() - 13, getHeight() - 20, this);
-        g.drawImage(queenImage, 0, 0, getWidth() , getHeight(), this);
+        // g.drawImage(rookImage, 0, 0, getWidth() - 13, getHeight() - 20, this);
+        g.drawImage(queenImage, 0, 0, getWidth(), getHeight(), this);
         g.setColor(Color.BLACK);
         if (isSelected()) { // Highlights the model if selected.
             g.setColor(Color.RED);
-            g.drawOval(0, 0, getWidth() , getHeight());
+            g.drawOval(0, 0, getWidth(), getHeight());
         }
     }
 }

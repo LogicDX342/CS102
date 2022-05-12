@@ -21,8 +21,9 @@ public abstract class ChessComponent extends JComponent {
      * 因此每个棋子占用的形状是一个正方形，大小是50*50
      */
 
-//    private static final Dimension CHESSGRID_SIZE = new Dimension(1080 / 4 * 3 / 8, 1080 / 4 * 3 / 8);
-    private static final Color[] BACKGROUND_COLORS = {Color.WHITE, Color.BLACK};
+    // private static final Dimension CHESSGRID_SIZE = new Dimension(1080 / 4 * 3 /
+    // 8, 1080 / 4 * 3 / 8);
+    private static final Color[] BACKGROUND_COLORS = { Color.WHITE, Color.BLACK };
     /**
      * handle click event
      */
@@ -38,17 +39,19 @@ public abstract class ChessComponent extends JComponent {
     private ChessboardPoint chessboardPoint;
     protected final ChessColor chessColor;
     private boolean selected;
-
     private boolean placed;
+    private boolean targeted;
 
-
-    protected ChessComponent(ChessboardPoint chessboardPoint, Point location, ChessColor chessColor, ClickController clickController, int size) {
+    protected ChessComponent(ChessboardPoint chessboardPoint, Point location, ChessColor chessColor,
+            ClickController clickController, int size) {
         enableEvents(AWTEvent.MOUSE_EVENT_MASK);
         setLocation(location);
         setSize(size, size);
         this.chessboardPoint = chessboardPoint;
         this.chessColor = chessColor;
         this.selected = false;
+        this.placed = false;
+        this.targeted = false;
         this.clickController = clickController;
     }
 
@@ -80,6 +83,17 @@ public abstract class ChessComponent extends JComponent {
         this.placed = placed;
     }
 
+    public boolean isTargeted() {
+        return targeted;
+    }
+
+    public void setTargeted(boolean targeted) {
+        this.targeted = targeted;
+    }
+
+    public abstract char getType();
+
+    public abstract void setTwoBlock();
 
     /**
      * @param another 主要用于和另外一个棋子交换位置
@@ -109,14 +123,14 @@ public abstract class ChessComponent extends JComponent {
             clickController.onClick(this);
         }
 
-        if(e.getID()==MouseEvent.MOUSE_ENTERED){
-            System.out.printf("Place [%d,%d]\n", chessboardPoint.getX(), chessboardPoint.getY());
-            placed=true;
+        if (e.getID() == MouseEvent.MOUSE_ENTERED) {
+            // System.out.printf("Place [%d,%d]\n", chessboardPoint.getX(), chessboardPoint.getY());
+            placed = true;
             repaint();
         }
-        if(e.getID()==MouseEvent.MOUSE_EXITED){
-            System.out.printf("Place [%d,%d]\n", chessboardPoint.getX(), chessboardPoint.getY());
-            placed=false;
+        if (e.getID() == MouseEvent.MOUSE_EXITED) {
+            // System.out.printf("Place [%d,%d]\n", chessboardPoint.getX(), chessboardPoint.getY());
+            placed = false;
             repaint();
         }
     }
@@ -125,8 +139,8 @@ public abstract class ChessComponent extends JComponent {
      * @param chessboard  棋盘
      * @param destination 目标位置，如(0, 0), (0, 7)等等
      * @return this棋子对象的移动规则和当前位置(chessboardPoint)能否到达目标位置
-     * <br>
-     * 这个方法主要是检查移动的合法性，如果合法就返回true，反之是false
+     *         <br>
+     *         这个方法主要是检查移动的合法性，如果合法就返回true，反之是false
      */
     public abstract boolean canMoveTo(ChessComponent[][] chessboard, ChessboardPoint destination);
 
@@ -143,10 +157,11 @@ public abstract class ChessComponent extends JComponent {
         super.paintComponents(g);
         System.out.printf("repaint chess [%d,%d]\n", chessboardPoint.getX(), chessboardPoint.getY());
         Color squareColor = BACKGROUND_COLORS[(chessboardPoint.getX() + chessboardPoint.getY()) % 2];
-        if(placed){
+        if (isPlaced() || isTargeted()) {
             g.setColor(Color.BLUE);
-        }else
-        {g.setColor(squareColor);}
+        } else {
+            g.setColor(squareColor);
+        }
 
         g.fillRect(0, 0, this.getWidth(), this.getHeight());
     }

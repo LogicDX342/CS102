@@ -16,13 +16,21 @@ public class EmptySlotComponent extends ChessComponent {
     }
 
     @Override
+    public char getType() {
+        return '_';
+    }
+
+    public void setTwoBlock() {
+    }
+
+    @Override
     public boolean canMoveTo(ChessComponent[][] chessboard, ChessboardPoint destination) {
         return false;
     }
 
     @Override
     public void loadResource() throws IOException {
-        //No resource!
+        // No resource!
     }
 
 }
