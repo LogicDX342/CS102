@@ -27,9 +27,7 @@ public class ClickController {
                 first = null;
                 recordFirst.repaint();
             } else if (handleSecond(chessComponent)) {
-                if (first.getType() == 'P') {
-                    first.setTwoBlock();
-                }
+                
                 // repaint in swap chess method.
                 chessboard.hideTargeted();
                 chessboard.swapColor();

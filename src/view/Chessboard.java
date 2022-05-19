@@ -6,12 +6,9 @@ import controller.GameController;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import javax.swing.Timer;
 
 /**
  * 这个类表示面板上的棋盘组件对象
@@ -38,7 +35,6 @@ public class Chessboard extends JComponent {
     private ArrayList<String> steps = new ArrayList<String>();
     private ChessGameFrame chessGameFrame;
     private GameController gameController;
-    private Timer timer;
     private boolean delay;
 
     public Chessboard(int width, int height, ChessGameFrame chessGameFrame) {
@@ -123,22 +119,24 @@ public class Chessboard extends JComponent {
                     CHESS_SIZE));
 
         }
+        if (chess1.getType() == 'P') {
+            chess1.setTwoBlock();
+        }
         chess1.swapLocation(chess2);
         int row1 = chess1.getChessboardPoint().getX(), col1 = chess1.getChessboardPoint().getY();
         chessComponents[row1][col1] = chess1;
         int row2 = chess2.getChessboardPoint().getX(), col2 = chess2.getChessboardPoint().getY();
         chessComponents[row2][col2] = chess2;
 
-        // \ chess1.paintImmediately(chess1.getX(), chess1.getY(), chess1.getWidth(),
-        // chess1.getHeight());
-        // chess2.paintImmediately(chess2.getX(), chess2.getY(), chess2.getWidth(),
-        // chess2.getHeight());
         chess1.repaint();
         chess2.repaint();
+
+        targetKing(chess1);
+
         if (online) {
             gameController.sendStep(steps.get(steps.size() - 1));
         }
-
+        
         chessGameFrame.musicPlayer("chessSound.wav", false);
     }
 
@@ -164,8 +162,8 @@ public class Chessboard extends JComponent {
     public void swapColor() {
         currentColor = currentColor == ChessColor.BLACK ? ChessColor.WHITE : ChessColor.BLACK;
         chessGameFrame.changeColorLabel(currentColor.toString());
-        chessGameFrame.addCountdownLabel(false);
-        chessGameFrame.addCountdownLabel(true);
+        chessGameFrame.countdown(false);
+        chessGameFrame.countdown(true);
     }
 
     private void initRookOnBoard(int row, int col, ChessColor color) {
@@ -236,6 +234,19 @@ public class Chessboard extends JComponent {
         for (int i = 0; i < chessComponents.length; i++) {
             for (int j = 0; j < chessComponents[i].length; j++) {
                 chessComponents[i][j].setTargeted(false);
+                chessComponents[i][j].repaint();
+            }
+        }
+    }
+
+    private void targetKing(ChessComponent chess) {
+        for (int i = 0; i < chessComponents.length; i++) {
+            for (int j = 0; j < chessComponents[i].length; j++) {
+                chessComponents[i][j].setTargeted(false);
+                if (chess.canMoveTo(chessComponents, new ChessboardPoint(i, j))
+                        && !chessComponents[i][j].getChessColor().equals(chess.getChessColor())
+                        && chessComponents[i][j].getType() == 'K')
+                    chessComponents[i][j].setTargeted(true);
                 chessComponents[i][j].repaint();
             }
         }
@@ -347,8 +358,8 @@ public class Chessboard extends JComponent {
         }
         steps = new ArrayList<>();
         currentColor = ChessColor.WHITE;
-        chessGameFrame.addCountdownLabel(false);
-        chessGameFrame.addCountdownLabel(true);
+        chessGameFrame.countdown(false);
+        chessGameFrame.countdown(true);
         chessGameFrame.changeColorLabel(currentColor.toString());
 
     }
