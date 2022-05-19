@@ -8,11 +8,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.util.List;
-
-import javax.crypto.Cipher;
-
 import java.awt.*;
-
 import model.ChessColor;
 import model.ChessComponent;
 import model.User;

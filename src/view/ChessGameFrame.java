@@ -36,6 +36,7 @@ public class ChessGameFrame extends JFrame {
     private File background;
     private javax.swing.Timer timer;
     private JLabel countdownLabel = new JLabel();
+    private JPanel controlPanel = new JPanel();
 
     public ChessGameFrame(int width, int height) {
         setTitle("2022 CS102A Project"); // 设置标题
@@ -73,7 +74,7 @@ public class ChessGameFrame extends JFrame {
                 }
             }
         };
-        setting.setLayout(new BoxLayout(setting, BoxLayout.Y_AXIS));
+        setting.setLayout(new BoxLayout(setting, BoxLayout.X_AXIS));
 
         game = new JPanel() {
             @Override
@@ -86,7 +87,7 @@ public class ChessGameFrame extends JFrame {
                 }
             }
         };
-        game.setLayout(null);
+        game.setLayout(new BorderLayout());
 
         add(menu, "Menu");
         addStartGameButton();
@@ -98,13 +99,21 @@ public class ChessGameFrame extends JFrame {
         addColorLabel();
         addLoadButton();
         addSaveButton();
+        addReplayButton();
         addRegretButton();
+        addResetButton();
         addMenuButton();
+        game.add(controlPanel, BorderLayout.EAST);
+        // game.add(new JPanel(), BorderLayout.WEST);
+        controlPanel.setBackground(null);
+        controlPanel.setOpaque(false);
 
         add(setting, "Setting");
+        controlPanel.setLayout(new BoxLayout(controlPanel, BoxLayout.Y_AXIS));
         addSignInButton();
         addSignUpButton();
         addBackgroundButton();
+        addBackButton();
 
         card.show(this.getContentPane(), "Menu");
 
@@ -141,7 +150,8 @@ public class ChessGameFrame extends JFrame {
                             if (check) {
                                 JOptionPane.showMessageDialog(this, "Successfully sign in");
                                 card.show(this.getContentPane(), "Game");
-                                addCountdownLabel(true);
+                                addCountdownLabel();
+                                countdown(true);
                             } else {
                                 JOptionPane.showMessageDialog(this, "Wrong username or password");
                             }
@@ -159,13 +169,13 @@ public class ChessGameFrame extends JFrame {
                             if (host.equals("")) {
                                 gameController.serverStart();
                                 card.show(this.getContentPane(), "Game");
-                                addCountdownLabel(true);
+                                addCountdownLabel();
+                                countdown(true);
 
                             } else {
                                 card.show(this.getContentPane(), "Game");
                                 game.repaint();
-                                addCountdownLabel(true);
-
+                                countdown(true);
                                 gameController.clientStart(host);
                             }
                         }
@@ -179,7 +189,8 @@ public class ChessGameFrame extends JFrame {
                             JOptionPane.DEFAULT_OPTION,
                             JOptionPane.INFORMATION_MESSAGE, null, optionsHardness, optionsHardness[0]));
                     card.show(this.getContentPane(), "Game");
-                    addCountdownLabel(true);
+                    addCountdownLabel();
+                    countdown(true);
                     break;
             }
 
@@ -219,7 +230,7 @@ public class ChessGameFrame extends JFrame {
 
     private void addSignInButton() {
         JButton button = new JButton("Sign in");
-        // button.setSize(200, 50);
+        button.setSize(200, 50);
         button.setFont(new Font("Rockwell", Font.BOLD, 20));
         setting.add(Box.createHorizontalGlue());
         setting.add(button);
@@ -254,7 +265,7 @@ public class ChessGameFrame extends JFrame {
     private void addSignUpButton() {
         JButton button = new JButton("Sign up");
         // button.setLocation(80, 10);
-        button.setSize(50, 50);
+        button.setSize(200, 50);
         button.setFont(new Font("Rockwell", Font.BOLD, 20));
         setting.add(Box.createHorizontalGlue());
         setting.add(button);
@@ -302,12 +313,11 @@ public class ChessGameFrame extends JFrame {
     private void addBackgroundButton() {
         JButton button = new JButton("Background");
         // button.setLocation(150, 10);
-        button.setSize(50, 50);
+        button.setSize(200, 50);
         button.setFont(new Font("Rockwell", Font.BOLD, 20));
         setting.add(Box.createHorizontalGlue());
         setting.add(button);
-        setting.add(Box.createHorizontalGlue());
-        
+
         button.addActionListener(e -> {
             System.out.println("Change background");
             String[] options = { "1", "2" };
@@ -318,6 +328,21 @@ public class ChessGameFrame extends JFrame {
         });
     }
 
+    private void addBackButton() {
+        JButton button = new JButton("Back");
+        // button.setLocation(150, 10);
+        button.setSize(200, 50);
+        button.setFont(new Font("Rockwell", Font.BOLD, 20));
+        setting.add(Box.createHorizontalGlue());
+        setting.add(button);
+        setting.add(Box.createHorizontalGlue());
+
+        button.addActionListener(e -> {
+            System.out.println("Back");
+            card.show(this.getContentPane(), "Menu");
+        });
+    }
+
     /**
      * 在游戏面板中添加棋盘
      */
@@ -325,7 +350,7 @@ public class ChessGameFrame extends JFrame {
         Chessboard chessboard = new Chessboard(CHESSBOARD_SIZE, CHESSBOARD_SIZE, this);
         gameController = new GameController(chessboard);
         chessboard.setLocation(HEIGTH / 10, HEIGTH / 10);
-        game.add(chessboard);
+        game.add(chessboard, BorderLayout.CENTER);
     }
 
     /**
@@ -334,33 +359,37 @@ public class ChessGameFrame extends JFrame {
 
     private void addColorLabel() {
         statusLabel = new JLabel("WHITE");
-        statusLabel.setLocation(HEIGTH, HEIGTH / 10);
-        statusLabel.setSize(200, 60);
+        // statusLabel.setLocation(HEIGTH, HEIGTH / 10);
+        statusLabel.setPreferredSize(new Dimension(200, 50));
         statusLabel.setFont(new Font("Rockwell", Font.BOLD, 20));
         statusLabel.setForeground(Color.WHITE);
-        game.add(statusLabel);
+        controlPanel.add(statusLabel);
+        controlPanel.add(Box.createVerticalGlue());
     }
 
     public void changeColorLabel(String color) {
         statusLabel.setText(color);
     }
 
-    public void addCountdownLabel(boolean start) {
-        if (start) {
-            countdownLabel.setLocation(HEIGTH, HEIGTH / 10 + 60);
-            countdownLabel.setSize(200, 60);
-            countdownLabel.setFont(new Font("Rockwell", Font.BOLD, 20));
-            countdownLabel.setForeground(Color.WHITE);
-            countdownLabel.setText(new SimpleDateFormat("mm:ss").format(500 * 1000));
+    public void addCountdownLabel() {
+        countdownLabel.setLocation(HEIGTH, HEIGTH / 10 + 60);
+        countdownLabel.setSize(200, 60);
+        countdownLabel.setFont(new Font("Rockwell", Font.BOLD, 20));
+        countdownLabel.setForeground(Color.WHITE);
+        countdownLabel.setText(new SimpleDateFormat("mm:ss").format(5 * 1000));
+        game.add(countdownLabel, BorderLayout.NORTH);
 
+    }
+
+    public void countdown(boolean start) {
+        if (start) {
             timer = new javax.swing.Timer(1000, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     String[] buff = countdownLabel.getText().split(":");
-                    int timeleft = Integer.parseInt(buff[0]) * 60 * 1000 + Integer.parseInt(buff[1]) * 1000 - 1000;
-                    countdownLabel.setText(new SimpleDateFormat("mm:ss").format(timeleft));
-                    game.add(countdownLabel);
-                    if (timeleft == 0) {
+                    int timeLeft = Integer.parseInt(buff[0]) * 60 * 1000 + Integer.parseInt(buff[1]) * 1000 - 1000;
+                    countdownLabel.setText(new SimpleDateFormat("mm:ss").format(timeLeft));
+                    if (timeLeft == 0) {
                         gameController.forceSwapColor();
                     }
                 }
@@ -368,16 +397,18 @@ public class ChessGameFrame extends JFrame {
             timer.start();
         } else {
             timer.stop();
+            countdownLabel.setText(new SimpleDateFormat("mm:ss").format(5 * 1000));
         }
     }
 
     private void addLoadButton() {
         JButton button = new JButton("Load");
-        button.setLocation(HEIGTH, HEIGTH / 10 + 240);
-        button.setSize(200, 60);
+        // button.setLocation(HEIGTH, HEIGTH / 10 + 240);
+        button.setMaximumSize(new Dimension(200, 50));
+        button.setPreferredSize(new Dimension(200, 50));
         button.setFont(new Font("Rockwell", Font.BOLD, 20));
-
-        game.add(button);
+        controlPanel.add(button);
+        controlPanel.add(Box.createVerticalGlue());
 
         button.addActionListener(e -> {
             System.out.println("Click load");
@@ -393,10 +424,12 @@ public class ChessGameFrame extends JFrame {
 
     private void addSaveButton() {
         JButton button = new JButton("Save");
-        button.setLocation(HEIGTH, HEIGTH / 10 + 360);
-        button.setSize(200, 60);
+        // button.setLocation(HEIGTH, HEIGTH / 10 + 360);
+        button.setMaximumSize(new Dimension(200, 50));
+        button.setPreferredSize(new Dimension(200, 50));
         button.setFont(new Font("Rockwell", Font.BOLD, 20));
-        game.add(button);
+        controlPanel.add(button);
+        controlPanel.add(Box.createVerticalGlue());
 
         button.addActionListener(e -> {
             System.out.println("Click save");
@@ -418,10 +451,12 @@ public class ChessGameFrame extends JFrame {
 
     private void addResetButton() {
         JButton button = new JButton("Reset");
-        button.setLocation(HEIGTH, HEIGTH / 10 + 480);
-        button.setSize(200, 60);
+        // button.setLocation(HEIGTH, HEIGTH / 10 + 480);
+        button.setMaximumSize(new Dimension(200, 50));
+        button.setPreferredSize(new Dimension(200, 50));
         button.setFont(new Font("Rockwell", Font.BOLD, 20));
-        game.add(button);
+        controlPanel.add(button);
+        controlPanel.add(Box.createVerticalGlue());
 
         button.addActionListener(e -> {
             System.out.println("Click reset");
@@ -433,24 +468,28 @@ public class ChessGameFrame extends JFrame {
 
     private void addRegretButton() {
         JButton button = new JButton("Regret");
-        button.setLocation(HEIGTH, HEIGTH / 10 + 480);
-        button.setSize(200, 60);
+        // button.setLocation(HEIGTH, HEIGTH / 10 + 480);
+        button.setMaximumSize(new Dimension(200, 50));
+        button.setPreferredSize(new Dimension(200, 50));
         button.setFont(new Font("Rockwell", Font.BOLD, 20));
-        game.add(button);
+        controlPanel.add(button);
+        controlPanel.add(Box.createVerticalGlue());
 
         button.addActionListener(e -> {
             System.out.println("Click reset");
-                gameController.regretStep();
-            
+            gameController.regretStep();
+
         });
     }
 
     private void addReplayButton() {
         JButton button = new JButton("Replay");
-        button.setLocation(HEIGTH, HEIGTH / 10 + 480);
-        button.setSize(200, 60);
+        // button.setLocation(HEIGTH, HEIGTH / 10 + 480);
+        button.setMaximumSize(new Dimension(200, 50));
+        button.setPreferredSize(new Dimension(200, 50));
         button.setFont(new Font("Rockwell", Font.BOLD, 20));
-        game.add(button);
+        controlPanel.add(button);
+        controlPanel.add(Box.createVerticalGlue());
 
         button.addActionListener(e -> {
             System.out.println("Click replay");
@@ -466,16 +505,19 @@ public class ChessGameFrame extends JFrame {
 
     private void addMenuButton() {
         JButton button = new JButton("Menu");
-        button.setLocation(HEIGTH, HEIGTH / 10 + 540);
-        button.setSize(200, 60);
+        // button.setLocation(HEIGTH, HEIGTH / 10 + 540);
+        button.setMaximumSize(new Dimension(200, 50));
+        button.setPreferredSize(new Dimension(200, 50));
         button.setFont(new Font("Rockwell", Font.BOLD, 20));
-        game.add(button);
+        controlPanel.add(button);
+        controlPanel.add(Box.createVerticalGlue());
 
         button.addActionListener(e -> {
             System.out.println("Click menu");
             gameController.resetGame();
             card.show(this.getContentPane(), "Menu");
-            addCountdownLabel(false);
+            countdown(true);
+            countdown(false);
         });
     }
 
