@@ -30,12 +30,13 @@ public class User {
 
     }
 
-    public User(String userName, String password, String avatar, String ID, String winTimes) throws IOException {
+    public User(String userName, String password, String avatar, String ID, String winTimes,File userData) throws IOException {
         this.userName = userName;
         this.password = password;
         this.avatar = new File(avatar);
         this.ID = Integer.parseInt(ID);
         this.winTimes = Integer.parseInt(winTimes);
+        this.userData=userData;
     }
 
     public void winCount() {

@@ -1,5 +1,6 @@
 package model;
 
+import view.Chessboard;
 import view.ChessboardPoint;
 import controller.ClickController;
 
@@ -15,24 +16,30 @@ public class KingChessComponent extends ChessComponent {
     /*
      * FIXME: 需要特别注意此处加载的图片是没有背景底色的！！！
      */
-    private static Image KING_WHITE;
-    private static Image KING_BLACK;
+    private  Image KING_WHITE;
+    private  Image KING_BLACK;
 
     private Image kingImage;
 
-    public void loadResource() throws IOException {
+    private int countKing;
+    public boolean notMoved = true;
+
+    @Override
+    public void setMoved(){notMoved = false;}
+
+    public void loadResource(String theme) throws IOException {
         if (KING_WHITE == null) {
-            KING_WHITE = ImageIO.read(new File("./resource/image/king-white.png"));
+            KING_WHITE = ImageIO.read(new File("./resource/image/"+theme+"king-white.png"));
         }
 
         if (KING_BLACK == null) {
-            KING_BLACK = ImageIO.read(new File("./resource/image/king-black.png"));
+            KING_BLACK = ImageIO.read(new File("./resource/image/"+theme+"king-black.png"));
         }
     }
 
-    private void initiateKingImage(ChessColor color) {
+    private void initiateKingImage(ChessColor color,String theme) {
         try {
-            loadResource();
+            loadResource(theme);
             if (color == ChessColor.WHITE) {
                 kingImage = KING_WHITE;
             } else if (color == ChessColor.BLACK) {
@@ -44,9 +51,10 @@ public class KingChessComponent extends ChessComponent {
     }
 
     public KingChessComponent(ChessboardPoint chessboardPoint, Point location, ChessColor color,
-            ClickController listener, int size) {
+            ClickController listener, int size,String theme) {
         super(chessboardPoint, location, color, listener, size);
-        initiateKingImage(color);
+        initiateKingImage(color,theme);
+        super.theme=theme;
     }
 
     @Override
@@ -58,9 +66,18 @@ public class KingChessComponent extends ChessComponent {
     }
 
     @Override
+    public boolean getMoved() {
+        return notMoved;
+    }
+
+    @Override
     public boolean canMoveTo(ChessComponent[][] chessComponents, ChessboardPoint destination) {
         ChessboardPoint source = getChessboardPoint();// source:棋子走之前的坐标
-        if (Math.abs(source.getX() - destination.getX()) == 1 && source.getY() == destination.getY()) {
+        if (notMoved && destination.getX() == source.getX() &&
+                (destination.getY() == 0 || destination.getY() == 7)){
+            return true;
+        }
+        else if (Math.abs(source.getX() - destination.getX()) == 1 && source.getY() == destination.getY()) {
             return true;
         } else if (Math.abs(source.getY() - destination.getY()) == 1 && source.getX() == destination.getX()) {
             return true;
@@ -68,8 +85,13 @@ public class KingChessComponent extends ChessComponent {
           // (source.getY() == destination.getY() || source.getX() == destination.getX())
         else if (Math.abs(source.getX() - destination.getX()) == 1
                 && Math.abs(source.getY() - destination.getY()) == 1) {
+            countKing = 1;
             return true;
         } // 斜着走一格
+        /*else if (!isMoved &&  = 'p' ){
+
+        }
+        */
         else {
             return false;
         }
@@ -83,6 +105,9 @@ public class KingChessComponent extends ChessComponent {
         if (isSelected()) { // Highlights the model if selected.
             g.setColor(Color.RED);
             g.drawOval(0, 0, getWidth(), getHeight());
+        }if(isTargeted()){
+            g.setColor(Color.GRAY);
+            g.fillOval(27,30,20,20);
         }
     }
 }

@@ -17,8 +17,8 @@ public class QueenChessComponent extends ChessComponent {
      * <br>
      * FIXME: 需要特别注意此处加载的图片是没有背景底色的！！！
      */
-    private static Image QUEEN_WHITE;
-    private static Image QUEEN_BLACK;
+    private Image QUEEN_WHITE;
+    private Image QUEEN_BLACK;
 
     /**
      * 车棋子对象自身的图片，是上面两种中的一种
@@ -30,13 +30,22 @@ public class QueenChessComponent extends ChessComponent {
      *
      * @throws IOException
      */
-    public void loadResource() throws IOException {
+
+    @Override
+    public void setMoved(){
+    }
+    @Override
+    public boolean getMoved() {
+        return false;
+    }
+
+    public void loadResource(String theme) throws IOException {
         if (QUEEN_WHITE == null) {
-            QUEEN_WHITE = ImageIO.read(new File("./resource/image/queen-white.png"));
+            QUEEN_WHITE = ImageIO.read(new File("./resource/image/"+theme+"queen-white.png"));
         }
 
         if (QUEEN_BLACK == null) {
-            QUEEN_BLACK = ImageIO.read(new File("./resource/image/queen-black.png"));
+            QUEEN_BLACK = ImageIO.read(new File("./resource/image/"+theme+"queen-black.png"));
         }
     }
 
@@ -46,9 +55,9 @@ public class QueenChessComponent extends ChessComponent {
      * @param color 棋子颜色
      */
 
-    private void initiateQueenImage(ChessColor color) {
+    private void initiateQueenImage(ChessColor color,String theme) {
         try {
-            loadResource();
+            loadResource(theme);
             if (color == ChessColor.WHITE) {
                 queenImage = QUEEN_WHITE;
             } else if (color == ChessColor.BLACK) {
@@ -60,9 +69,10 @@ public class QueenChessComponent extends ChessComponent {
     }
 
     public QueenChessComponent(ChessboardPoint chessboardPoint, Point location, ChessColor color,
-            ClickController listener, int size) {
+            ClickController listener, int size,String theme) {
         super(chessboardPoint, location, color, listener, size);
-        initiateQueenImage(color);
+        initiateQueenImage(color,theme);
+        super.theme=theme;
     }
 
     @Override
@@ -128,6 +138,9 @@ public class QueenChessComponent extends ChessComponent {
         if (isSelected()) { // Highlights the model if selected.
             g.setColor(Color.RED);
             g.drawOval(0, 0, getWidth(), getHeight());
+        }if(isTargeted()){
+            g.setColor(Color.GRAY);
+            g.fillOval(27,30,20,20);
         }
     }
 }

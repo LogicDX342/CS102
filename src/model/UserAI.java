@@ -9,8 +9,8 @@ public class UserAI extends User {
         super("userAI", "userAI", new File("./resource/image/aiAvatar.png"), -1);
     }
 
-    public UserAI(String userName, String password, String avatar, String ID, String winTimes) throws IOException {
-        super(userName, password, avatar, ID, winTimes);
+    public UserAI(String userName, String password, String avatar, String ID, String winTimes,File userData) throws IOException {
+        super(userName, password, avatar, ID, winTimes, userData);
     }
 
 }

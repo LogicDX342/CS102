@@ -23,7 +23,7 @@ public class UserList {
                 Reader reader = new FileReader(user.getPath());
                 char[] buffer = new char[200];
                 reader.read(buffer);
-                loadUserList(new String(buffer).split("&#"));
+                loadUserList(new String(buffer).split("&#"),user);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -41,8 +41,8 @@ public class UserList {
         return true;
     }
 
-    private void loadUserList(String[] profile) throws IOException {
-        userList.add(new User(profile[0], profile[1], profile[2], profile[3], profile[4]));
+    private void loadUserList(String[] profile,File userData) throws IOException {
+        userList.add(new User(profile[0], profile[1], profile[2], profile[3], profile[4],userData));
     }
 
     public ArrayList<User> getUserList() {

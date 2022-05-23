@@ -15,24 +15,32 @@ public class BishopChessComponent extends ChessComponent{
     /*
      * FIXME: 需要特别注意此处加载的图片是没有背景底色的！！！
      */
-    private static Image BISHOP_WHITE;
-    private static Image BISHOP_BLACK;
+    private Image BISHOP_WHITE;
+    private Image BISHOP_BLACK;
 
     private Image bishopImage;
 
-    public void loadResource() throws IOException {
+    @Override
+    public void setMoved() {
+    }
+    @Override
+    public boolean getMoved() {
+        return false;
+    }
+
+    public void loadResource(String theme) throws IOException {
         if (BISHOP_WHITE == null) {
-            BISHOP_WHITE = ImageIO.read(new File("./resource/image/bishop-white.png"));
+            BISHOP_WHITE = ImageIO.read(new File("./resource/image/"+theme+"bishop-white.png"));
         }
 
         if (BISHOP_BLACK == null) {
-            BISHOP_BLACK = ImageIO.read(new File("./resource/image/bishop-black.png"));
+            BISHOP_BLACK = ImageIO.read(new File("./resource/image/"+theme+"bishop-black.png"));
         }
     }
 
-    private void initiateBishopImage(ChessColor color) {
+    private void initiateBishopImage(ChessColor color,String theme) {
         try {
-            loadResource();
+            loadResource(theme);
             if (color == ChessColor.WHITE) {
                 bishopImage = BISHOP_WHITE;
             } else if (color == ChessColor.BLACK) {
@@ -43,9 +51,10 @@ public class BishopChessComponent extends ChessComponent{
         }
     }
 
-    public BishopChessComponent(ChessboardPoint chessboardPoint, Point location, ChessColor color, ClickController listener, int size) {
+    public BishopChessComponent(ChessboardPoint chessboardPoint, Point location, ChessColor color, ClickController listener, int size,String theme) {
         super(chessboardPoint, location, color, listener, size);
-        initiateBishopImage(color);
+        initiateBishopImage(color,theme);
+        super.theme=theme;
     }
 
     public char getType(){
@@ -87,6 +96,10 @@ public class BishopChessComponent extends ChessComponent{
         if (isSelected()) { // Highlights the model if selected.
             g.setColor(Color.RED);
             g.drawOval(0, 0, getWidth() , getHeight());
+        }
+        if(isTargeted()){
+            g.setColor(Color.GRAY);
+            g.fillOval(27,30,20,20);
         }
     }
 }

@@ -1,6 +1,7 @@
 package view;
 
 import controller.GameController;
+import model.ChessColor;
 import model.User;
 import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioInputStream;
@@ -26,6 +27,7 @@ public class ChessGameFrame extends JFrame {
     private final int WIDTH;
     private final int HEIGTH;
     public final int CHESSBOARD_SIZE;
+    private int theme;
     private GameController gameController;
     private JLabel statusLabel;
     private UserList userList = new UserList();
@@ -37,6 +39,8 @@ public class ChessGameFrame extends JFrame {
     private javax.swing.Timer timer;
     private JLabel countdownLabel = new JLabel();
     private JPanel controlPanel = new JPanel();
+    private Chessboard chessboard;
+
 
     public ChessGameFrame(int width, int height) {
         setTitle("2022 CS102A Project"); // 设置标题
@@ -88,15 +92,23 @@ public class ChessGameFrame extends JFrame {
             }
         };
         game.setLayout(new BorderLayout());
+         JLabel a = new JLabel(" ,");
+        JLabel b = new JLabel(" ,");
+        a.setSize(100, 100);
+        b.setSize(100, 100);
+        game.add(a, BorderLayout.WEST);
+        game.add(b, BorderLayout.NORTH);
 
         add(menu, "Menu");
         addStartGameButton();
         addRankButton();
         addSettingButton();
+        addSignInButton();
 
         add(game, "Game");
         addChessboard();
         addColorLabel();
+        addCountdownLabel();
         addLoadButton();
         addSaveButton();
         addReplayButton();
@@ -110,9 +122,9 @@ public class ChessGameFrame extends JFrame {
 
         add(setting, "Setting");
         controlPanel.setLayout(new BoxLayout(controlPanel, BoxLayout.Y_AXIS));
-        addSignInButton();
         addSignUpButton();
         addBackgroundButton();
+        addChessThemeButton();
         addBackButton();
 
         card.show(this.getContentPane(), "Menu");
@@ -150,7 +162,7 @@ public class ChessGameFrame extends JFrame {
                             if (check) {
                                 JOptionPane.showMessageDialog(this, "Successfully sign in");
                                 card.show(this.getContentPane(), "Game");
-                                addCountdownLabel();
+
                                 countdown(true);
                             } else {
                                 JOptionPane.showMessageDialog(this, "Wrong username or password");
@@ -169,7 +181,6 @@ public class ChessGameFrame extends JFrame {
                             if (host.equals("")) {
                                 gameController.serverStart();
                                 card.show(this.getContentPane(), "Game");
-                                addCountdownLabel();
                                 countdown(true);
 
                             } else {
@@ -189,7 +200,6 @@ public class ChessGameFrame extends JFrame {
                             JOptionPane.DEFAULT_OPTION,
                             JOptionPane.INFORMATION_MESSAGE, null, optionsHardness, optionsHardness[0]));
                     card.show(this.getContentPane(), "Game");
-                    addCountdownLabel();
                     countdown(true);
                     break;
             }
@@ -230,10 +240,10 @@ public class ChessGameFrame extends JFrame {
 
     private void addSignInButton() {
         JButton button = new JButton("Sign in");
-        button.setSize(200, 50);
-        button.setFont(new Font("Rockwell", Font.BOLD, 20));
-        setting.add(Box.createHorizontalGlue());
-        setting.add(button);
+        button.setLocation(30, 30);
+        button.setSize(90, 40);
+        button.setFont(new Font("Rockwell", Font.PLAIN, 18));
+        menu.add(button);
 
         button.addActionListener(e -> {
             String userName = JOptionPane.showInputDialog(this, "Input your username", "Sign in",
@@ -253,6 +263,14 @@ public class ChessGameFrame extends JFrame {
                     }
                     if (check) {
                         JOptionPane.showMessageDialog(this, "Successfully sign in");
+                        menu.remove(button);
+                        JLabel info = new JLabel("Welcome, " + userName);
+                        info.setLocation(20, 0);
+                        info.setSize(200, 40);
+                        info.setFont(new Font("Rockwell", Font.ITALIC, 16));
+                        info.setForeground(Color.WHITE);
+                        menu.add(info);
+                        menu.repaint();
                     } else {
                         JOptionPane.showMessageDialog(this, "Wrong username or password");
                     }
@@ -328,6 +346,24 @@ public class ChessGameFrame extends JFrame {
         });
     }
 
+    private void addChessThemeButton() {
+        JButton button = new JButton("Theme");
+        // button.setLocation(150, 10);
+        button.setSize(200, 50);
+        button.setFont(new Font("Rockwell", Font.BOLD, 20));
+        setting.add(Box.createHorizontalGlue());
+        setting.add(button);
+
+        button.addActionListener(e -> {
+            System.out.println("Change theme");
+            String[] options = { "1", "2" };
+             theme = JOptionPane.showOptionDialog(this, "Choose a mode", "Start game", JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+            game.remove(chessboard);
+            addChessboard();
+        });
+    }
+
     private void addBackButton() {
         JButton button = new JButton("Back");
         // button.setLocation(150, 10);
@@ -347,10 +383,11 @@ public class ChessGameFrame extends JFrame {
      * 在游戏面板中添加棋盘
      */
     private void addChessboard() {
-        Chessboard chessboard = new Chessboard(CHESSBOARD_SIZE, CHESSBOARD_SIZE, this);
+        chessboard = new Chessboard(CHESSBOARD_SIZE, CHESSBOARD_SIZE, this,theme);
         gameController = new GameController(chessboard);
         chessboard.setLocation(HEIGTH / 10, HEIGTH / 10);
         game.add(chessboard, BorderLayout.CENTER);
+       
     }
 
     /**
@@ -358,13 +395,16 @@ public class ChessGameFrame extends JFrame {
      */
 
     private void addColorLabel() {
+        JLabel jb = new JLabel("Current Player");
+        jb.setFont(new Font("Rockwell", Font.BOLD, 24));
+        jb.setForeground(Color.WHITE);
+        controlPanel.add(jb);
         statusLabel = new JLabel("WHITE");
         // statusLabel.setLocation(HEIGTH, HEIGTH / 10);
         statusLabel.setPreferredSize(new Dimension(200, 50));
-        statusLabel.setFont(new Font("Rockwell", Font.BOLD, 20));
+        statusLabel.setFont(new Font("Rockwell", Font.ITALIC, 20));
         statusLabel.setForeground(Color.WHITE);
         controlPanel.add(statusLabel);
-        controlPanel.add(Box.createVerticalGlue());
     }
 
     public void changeColorLabel(String color) {
@@ -376,8 +416,10 @@ public class ChessGameFrame extends JFrame {
         countdownLabel.setSize(200, 60);
         countdownLabel.setFont(new Font("Rockwell", Font.BOLD, 20));
         countdownLabel.setForeground(Color.WHITE);
-        countdownLabel.setText(new SimpleDateFormat("mm:ss").format(5 * 1000));
-        game.add(countdownLabel, BorderLayout.NORTH);
+        countdownLabel.setText(new SimpleDateFormat("mm:ss").format(50 * 1000));
+        // game.add(countdownLabel, BorderLayout.NORTH);
+        controlPanel.add(countdownLabel);
+        controlPanel.add(Box.createVerticalGlue());
 
     }
 
@@ -397,7 +439,7 @@ public class ChessGameFrame extends JFrame {
             timer.start();
         } else {
             timer.stop();
-            countdownLabel.setText(new SimpleDateFormat("mm:ss").format(5 * 1000));
+            countdownLabel.setText(new SimpleDateFormat("mm:ss").format(50 * 1000));
         }
     }
 
@@ -516,9 +558,25 @@ public class ChessGameFrame extends JFrame {
             System.out.println("Click menu");
             gameController.resetGame();
             card.show(this.getContentPane(), "Menu");
-            countdown(true);
             countdown(false);
         });
+    }
+
+    public int showGradeButton() {
+        String[] optionsChess = { "Bishop", "Knight", "Queen", "Rook" };
+        return JOptionPane.showOptionDialog(this, "Choose a mode", "Start game", JOptionPane.DEFAULT_OPTION,
+                JOptionPane.INFORMATION_MESSAGE, null, optionsChess, optionsChess[0]);
+
+    }
+
+    public void win(ChessColor color) {
+        JOptionPane.showMessageDialog(this, color.toString() + " WIN");
+        gameController.resetGame();
+    }
+
+    public void draw() {
+        JOptionPane.showMessageDialog(this, "DRAW");
+        gameController.resetGame();
     }
 
     protected void musicPlayer(String musicFile, boolean loop) {

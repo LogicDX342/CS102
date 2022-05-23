@@ -24,6 +24,7 @@ public abstract class ChessComponent extends JComponent {
     // private static final Dimension CHESSGRID_SIZE = new Dimension(1080 / 4 * 3 /
     // 8, 1080 / 4 * 3 / 8);
     private static final Color[] BACKGROUND_COLORS = { Color.WHITE, Color.BLACK };
+    private static final Color[] BACKGROUND_COLORS2 = { Color.WHITE, new Color(138,171,105) };
     /**
      * handle click event
      */
@@ -41,6 +42,7 @@ public abstract class ChessComponent extends JComponent {
     private boolean selected;
     private boolean placed;
     private boolean targeted;
+    protected String theme="theme0";
 
     protected ChessComponent(ChessboardPoint chessboardPoint, Point location, ChessColor chessColor,
             ClickController clickController, int size) {
@@ -93,6 +95,10 @@ public abstract class ChessComponent extends JComponent {
 
     public abstract char getType();
 
+    public abstract void setMoved();
+
+    public abstract boolean getMoved();
+
     public abstract void setTwoBlock();
 
     /**
@@ -124,12 +130,14 @@ public abstract class ChessComponent extends JComponent {
         }
 
         if (e.getID() == MouseEvent.MOUSE_ENTERED) {
-            // System.out.printf("Place [%d,%d]\n", chessboardPoint.getX(), chessboardPoint.getY());
+            // System.out.printf("Place [%d,%d]\n", chessboardPoint.getX(),
+            // chessboardPoint.getY());
             placed = true;
             repaint();
         }
         if (e.getID() == MouseEvent.MOUSE_EXITED) {
-            // System.out.printf("Place [%d,%d]\n", chessboardPoint.getX(), chessboardPoint.getY());
+            // System.out.printf("Place [%d,%d]\n", chessboardPoint.getX(),
+            // chessboardPoint.getY());
             placed = false;
             repaint();
         }
@@ -149,23 +157,32 @@ public abstract class ChessComponent extends JComponent {
      *
      * @throws IOException 如果一些资源找不到(如棋子图片路径错误)，就会抛出异常
      */
-    public abstract void loadResource() throws IOException;
+    public abstract void loadResource(String theme) throws IOException;
 
     @Override
 
     protected void paintComponent(Graphics g) {
         super.paintComponents(g);
         System.out.printf("repaint chess [%d,%d]\n", chessboardPoint.getX(), chessboardPoint.getY());
-        Color squareColor = BACKGROUND_COLORS[(chessboardPoint.getX() + chessboardPoint.getY()) % 2];
-        if (isPlaced() || isTargeted()) {
+        Color squareColor = BACKGROUND_COLORS2[(chessboardPoint.getX() + chessboardPoint.getY()) % 2];
+        if (theme.equals("theme1/")) {
+            squareColor = BACKGROUND_COLORS[(chessboardPoint.getX() + chessboardPoint.getY()) % 2];
+
+        }
+        g.setColor(squareColor);
+        if (isTargeted() && getType() == 'K') {
+            g.setColor(Color.RED);
+        }
+        g.fillRect(0, 0, this.getWidth(), this.getHeight());
+        if (isPlaced()) {
             g.setColor(Color.BLUE);
         } else {
             g.setColor(squareColor);
         }
-        if(isTargeted()&&getType()=='K'){
-            g.setColor(Color.RED);
+        if (isTargeted()) {
+            g.setColor(Color.GRAY);
+            g.fillOval(27, 30, 20, 20);
         }
 
-        g.fillRect(0, 0, this.getWidth(), this.getHeight());
     }
 }

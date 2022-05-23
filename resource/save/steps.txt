@@ -1,0 +1,28 @@
+WPg3e3
+BPb4d4
+WPe3d3
+BPb2d2
+WPd3c2
+BBa5b4
+WPg5e5
+BNa6c7
+WPg4e4
+BKa4a6
+BRa7a5
+WBh2g3
+BPb3c2
+WNh1f2
+BPd4e5
+WQh3d7
+BPe5f5
+WKh4h2
+WRh0h3
+end
+BR BN BB BQ N_ BR BK N_ 
+BP BP N_ N_ BB BP BP BP 
+N_ N_ BP N_ N_ N_ N_ BN 
+N_ N_ N_ N_ N_ N_ N_ WQ 
+N_ N_ N_ N_ WP N_ N_ N_ 
+N_ N_ WN N_ N_ BP N_ N_ 
+WP WP WP WB N_ N_ WP WP 
+N_ N_ WK WR N_ WB WN WR 

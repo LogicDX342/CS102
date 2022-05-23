@@ -17,26 +17,40 @@ public class RookChessComponent extends ChessComponent {
      * <br>
      * FIXME: 需要特别注意此处加载的图片是没有背景底色的！！！
      */
-    private static Image ROOK_WHITE;
-    private static Image ROOK_BLACK;
+    private Image ROOK_WHITE;
+    private Image ROOK_BLACK;
 
     /**
      * 车棋子对象自身的图片，是上面两种中的一种
      */
     private Image rookImage;
 
+    public boolean notMoved = true;
+
+    @Override
+    public void setMoved(){
+        notMoved = false;
+    }
+    @Override
+    public boolean getMoved() {
+        return notMoved;
+    }
+
     /**
      * 读取加载车棋子的图片
      *
      * @throws IOException
      */
-    public void loadResource() throws IOException {
+
+    public static boolean isMoved;
+
+    public void loadResource(String theme) throws IOException {
         if (ROOK_WHITE == null) {
-            ROOK_WHITE = ImageIO.read(new File("./resource/image/rook-white.png"));
+            ROOK_WHITE = ImageIO.read(new File("./resource/image/"+theme+"rook-white.png"));
         }
 
         if (ROOK_BLACK == null) {
-            ROOK_BLACK = ImageIO.read(new File("./resource/image/rook-black.png"));
+            ROOK_BLACK = ImageIO.read(new File("./resource/image/"+theme+"rook-black.png"));
         }
     }
 
@@ -46,9 +60,9 @@ public class RookChessComponent extends ChessComponent {
      * @param color 棋子颜色
      */
 
-    private void initiateRookImage(ChessColor color) {
+    private void initiateRookImage(ChessColor color,String theme) {
         try {
-            loadResource();
+            loadResource(theme);
             if (color == ChessColor.WHITE) {
                 rookImage = ROOK_WHITE;
             } else if (color == ChessColor.BLACK) {
@@ -60,9 +74,10 @@ public class RookChessComponent extends ChessComponent {
     }
 
     public RookChessComponent(ChessboardPoint chessboardPoint, Point location, ChessColor color,
-            ClickController listener, int size) {
+            ClickController listener, int size,String theme) {
         super(chessboardPoint, location, color, listener, size);
-        initiateRookImage(color);
+        initiateRookImage(color,theme);
+        super.theme=theme;
     }
 
     @Override
@@ -103,7 +118,7 @@ public class RookChessComponent extends ChessComponent {
         } else { // Not on the same row or the same column.
             return false;
         }
-        return true;
+            return true;
     }
 
     /**
@@ -120,6 +135,9 @@ public class RookChessComponent extends ChessComponent {
         if (isSelected()) { // Highlights the model if selected.
             g.setColor(Color.RED);
             g.drawOval(0, 0, getWidth(), getHeight());
+        }if(isTargeted()){
+            g.setColor(Color.GRAY);
+            g.fillOval(27,30,20,20);
         }
     }
 }

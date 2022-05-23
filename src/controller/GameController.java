@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.util.List;
-import java.awt.*;
 import model.ChessColor;
 import model.ChessComponent;
 import model.User;
@@ -77,8 +76,10 @@ public class GameController {
     }
 
     public void regretStep() {
-        chessboard.getSteps().remove(chessboard.getSteps().size()-1);
-        chessboard.loadGame(chessboard.getSteps());
+        if (chessboard.getSteps().size() != 0) {
+            chessboard.getSteps().remove(chessboard.getSteps().size() - 1);
+            chessboard.loadGame(chessboard.getSteps());
+        }
     }
 
     public int saveGameToFile(File save) {
@@ -87,7 +88,7 @@ public class GameController {
             Writer writer;
             writer = new FileWriter(save);
             for (String str : chessboard.getSteps()) {
-                writer.write(str+"\n");
+                writer.write(str + "\n");
             }
             writer.write("end\n");
 
@@ -113,12 +114,12 @@ public class GameController {
     }
 
     public void move(String step, boolean online) {
-        Color color;
-        if (step.charAt(0) == 'B') {
-            color = Color.BLACK;
-        } else {
-            color = Color.WHITE;
-        }
+        // Color color;
+        // if (step.charAt(0) == 'B') {
+        // color = Color.BLACK;
+        // } else {
+        // color = Color.WHITE;
+        // }
         // if (chessboard.getCurrentColor().getColor().equals(color)) {
         int col1 = step.charAt(2) - 'a', row1 = step.charAt(3) - '0';
         int col2 = step.charAt(4) - 'a', row2 = step.charAt(5) - '0';
@@ -131,6 +132,9 @@ public class GameController {
 
     public void forceSwapColor() {
         chessboard.swapColor();
+    }
+    public void setTheme(int theme){
+        chessboard.setTheme(theme);
     }
 
     public void resetGame() {
@@ -163,9 +167,14 @@ public class GameController {
 
     public void winCount(ChessColor color) {
         if (color.equals(ChessColor.WHITE)) {
-            userW.winCount();
+            if (userW != null) {
+                userW.winCount();
+            }
         } else {
-            userB.winCount();
+            if (userB != null) {
+                userB.winCount();
+            }
         }
     }
+
 }

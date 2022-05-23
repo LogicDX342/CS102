@@ -15,24 +15,32 @@ public class KnightChessComponent extends ChessComponent {
     /*
      * FIXME: 需要特别注意此处加载的图片是没有背景底色的！！！
      */
-    private static Image KNIGHT_WHITE;
-    private static Image KNIGHT_BLACK;
+    private Image KNIGHT_WHITE;
+    private Image KNIGHT_BLACK;
 
     private Image knightImage;
 
-    public void loadResource() throws IOException {
+    @Override
+    public void setMoved(){
+    }
+    @Override
+    public boolean getMoved() {
+        return false;
+    }
+
+    public void loadResource(String theme) throws IOException {
         if (KNIGHT_WHITE == null) {
-            KNIGHT_WHITE = ImageIO.read(new File("./resource/image/knight-white.png"));
+            KNIGHT_WHITE = ImageIO.read(new File("./resource/image/"+theme+"knight-white.png"));
         }
 
         if (KNIGHT_BLACK == null) {
-            KNIGHT_BLACK = ImageIO.read(new File("./resource/image/knight-black.png"));
+            KNIGHT_BLACK = ImageIO.read(new File("./resource/image/"+theme+"knight-black.png"));
         }
     }
 
-    private void initiateKnightImage(ChessColor color) {
+    private void initiateKnightImage(ChessColor color,String theme) {
         try {
-            loadResource();
+            loadResource(theme);
             if (color == ChessColor.WHITE) {
                 knightImage = KNIGHT_WHITE;
             } else if (color == ChessColor.BLACK) {
@@ -44,9 +52,10 @@ public class KnightChessComponent extends ChessComponent {
     }
 
     public KnightChessComponent(ChessboardPoint chessboardPoint, Point location, ChessColor color,
-            ClickController listener, int size) {
+            ClickController listener, int size,String theme) {
         super(chessboardPoint, location, color, listener, size);
-        initiateKnightImage(color);
+        initiateKnightImage(color,theme);
+        super.theme=theme;
     }
 
     @Override
@@ -78,6 +87,9 @@ public class KnightChessComponent extends ChessComponent {
         if (isSelected()) { // Highlights the model if selected.
             g.setColor(Color.RED);
             g.drawOval(0, 0, getWidth(), getHeight());
+        }if(isTargeted()){
+            g.setColor(Color.GRAY);
+            g.fillOval(27,30,20,20);
         }
     }
 }

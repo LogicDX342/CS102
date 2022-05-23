@@ -11,8 +11,17 @@ import java.io.IOException;
  */
 public class EmptySlotComponent extends ChessComponent {
 
-    public EmptySlotComponent(ChessboardPoint chessboardPoint, Point location, ClickController listener, int size) {
+    public EmptySlotComponent(ChessboardPoint chessboardPoint, Point location, ClickController listener, int size,String theme) {
         super(chessboardPoint, location, ChessColor.NONE, listener, size);
+        super.theme=theme;
+    }
+
+    @Override
+    public void setMoved(){
+    }
+    @Override
+    public boolean getMoved() {
+        return false;
     }
 
     @Override
@@ -29,8 +38,9 @@ public class EmptySlotComponent extends ChessComponent {
     }
 
     @Override
-    public void loadResource() throws IOException {
+    public void loadResource(String theme) throws IOException {
         // No resource!
+      
     }
 
 }
