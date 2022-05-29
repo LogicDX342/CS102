@@ -173,12 +173,13 @@ public abstract class ChessComponent extends JComponent {
         if (isTargeted() && getType() == 'K') {
             g.setColor(Color.RED);
         }
-        g.fillRect(0, 0, this.getWidth(), this.getHeight());
         if (isPlaced()) {
             g.setColor(Color.BLUE);
         } else {
             g.setColor(squareColor);
         }
+                g.fillRect(0, 0, this.getWidth(), this.getHeight());
+
         if (isTargeted()) {
             g.setColor(Color.GRAY);
             g.fillOval(27, 30, 20, 20);

@@ -342,7 +342,8 @@ public class Chessboard extends JComponent {
 
     Thread thread;
 
-    public void loadGame(List<String> chessData) {
+    public void loadGame(List<String> chessData
+    ) {
         resetGame();
         Thread thread2 = new Thread() {
             @Override
