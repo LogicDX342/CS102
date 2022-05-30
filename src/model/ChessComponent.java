@@ -170,13 +170,13 @@ public abstract class ChessComponent extends JComponent {
 
         }
         g.setColor(squareColor);
-        if (isTargeted() && getType() == 'K') {
-            g.setColor(Color.RED);
-        }
+        
         if (isPlaced()) {
             g.setColor(Color.BLUE);
         } else {
             g.setColor(squareColor);
+        }if (isTargeted() && getType() == 'K') {
+            g.setColor(Color.RED);
         }
                 g.fillRect(0, 0, this.getWidth(), this.getHeight());
 
